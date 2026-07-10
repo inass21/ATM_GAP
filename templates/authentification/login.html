@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASIMS - Supervision</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bankNavy: '#0A2540',
+                        bankBlue: '#639FAB',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Pattern background khfif b l-azra9 dyal l-banque */
+        .bg-pattern {
+            background-color: #f8fafc;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h20v2H22v20h-2V22H0v-2h20v-.5zM36 40h2V20h-2v20zM22 40h2V20h-2v20zM8 40h2V20H8v20z' fill='%23639FAB' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        /* Floating Cards Keyframes */
+        @keyframes float-center {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0px) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) translateY(-10px) rotate(0.5deg); }
+        }
+        @keyframes float-top-right {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(-1deg); }
+        }
+        @keyframes float-bottom-left {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(0.5deg); }
+        }
+        @keyframes float-bottom-right {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(-0.3deg); }
+        }
+
+        .anim-float-center {
+            animation: float-center 6.5s ease-in-out infinite;
+        }
+        .anim-float-top-right {
+            animation: float-top-right 7.5s ease-in-out infinite;
+        }
+        .anim-float-bottom-left {
+            animation: float-bottom-left 6s ease-in-out infinite;
+        }
+        .anim-float-bottom-right {
+            animation: float-bottom-right 7s ease-in-out infinite;
+        }
+
+        /* Pause floating animation on hover and scale up slightly for better tactile feedback */
+        .hover-pause:hover {
+            animation-play-state: paused;
+            transform: scale(1.03);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        /* Specific transform for central card hover because of translate-x/y centering */
+        .hover-pause-center:hover {
+            animation-play-state: paused;
+            transform: translate(-50%, -50%) scale(1.03);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Staggered Load Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            opacity: 0;
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .anim-delay-100 { animation-delay: 80ms; }
+        .anim-delay-200 { animation-delay: 160ms; }
+        .anim-delay-300 { animation-delay: 240ms; }
+        .anim-delay-400 { animation-delay: 320ms; }
+        .anim-delay-500 { animation-delay: 400ms; }
+        .anim-delay-600 { animation-delay: 480ms; }
+        .anim-delay-700 { animation-delay: 560ms; }
+
+        .password-input {
+            letter-spacing: 0.3em;
+        }
+        .password-input.text-visible {
+            letter-spacing: normal;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col lg:flex-row font-sans antialiased text-slate-800 m-0 p-0 overflow-x-hidden relative">
+
+    <!-- Ambient background glows and pattern for overall page depth -->
+    <div class="absolute inset-0 bg-pattern opacity-10 pointer-events-none z-0"></div>
+    <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-bankBlue/5 blur-[100px] pointer-events-none z-0"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-bankNavy/5 blur-[120px] pointer-events-none z-0"></div>
+
+    <!-- ==================== LEFT SIDE (Login Form) ==================== -->
+    <div class="w-full lg:w-1/2 p-10 lg:p-16 flex flex-col relative bg-white/95 backdrop-blur-md justify-between min-h-screen z-10">
+        
+        <div class="max-w-md w-full mx-auto flex flex-col justify-between flex-grow">
+            <div class="flex items-center space-x-3.5 text-bankNavy font-extrabold text-4xl tracking-wider opacity-0 animate-fade-in-up">
+                <svg class="w-10 h-10 text-bankNavy" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <span>ASIMS</span>
+            </div>
+
+            <!-- Login Section -->
+            <div class="flex-grow flex flex-col justify-center py-12">
+                <h2 class="text-3.5xl font-bold mb-2 text-bankNavy tracking-tight opacity-0 animate-fade-in-up anim-delay-100">Bienvenue</h2>
+                <p class="text-sm text-slate-500 mb-10 opacity-0 animate-fade-in-up anim-delay-200">Connectez-vous à votre espace de supervision.</p>
+
+                <!-- Form -->
+                <form class="space-y-6" method="post">
+                    <div class="hidden">{% csrf_token %}</div>
+                    
+                    <!-- Username -->
+                    <div class="flex flex-col space-y-1.5 opacity-0 animate-fade-in-up anim-delay-300">
+                        <label class="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Identifiant</label>
+                        <input type="text" name="username" class="w-full bg-slate-50 border border-slate-200 hover:border-bankNavy focus:border-bankNavy focus:ring-4 focus:ring-bankNavy/5 focus:bg-white outline-none rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 transition-all duration-200">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="flex flex-col space-y-1.5 relative opacity-0 animate-fade-in-up anim-delay-400">
+                        <label class="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Mot de passe</label>
+                        <div class="relative flex items-center">
+                            <input type="password" id="password" name="password" class="w-full bg-slate-50 border border-slate-200 hover:border-bankNavy focus:border-bankNavy focus:ring-4 focus:ring-bankNavy/5 focus:bg-white outline-none rounded-xl pl-4 pr-12 py-3 text-sm font-semibold text-slate-800 password-input transition-all duration-200">
+                            <!-- Eye Icon -->
+                            <button type="button" class="absolute right-4 text-slate-400 hover:text-bankNavy transition-colors focus:outline-none" onclick="togglePassword()">
+                                <svg id="eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember & Forgot -->
+                    <div class="flex justify-between items-center pt-2 opacity-0 animate-fade-in-up anim-delay-500">
+                        <label class="flex items-center space-x-2.5 cursor-pointer group">
+                            <div class="relative w-4 h-4">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="absolute inset-0 border border-slate-300 rounded bg-white peer-checked:bg-bankNavy peer-checked:border-bankNavy transition-all"></div>
+                                <svg class="absolute inset-0 m-auto w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs text-slate-500 font-medium group-hover:text-slate-700 transition-colors">Se souvenir de moi</span>
+                        </label>
+                        <a href="#" class="text-xs text-bankBlue font-semibold hover:text-bankNavy transition-colors relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-bankNavy after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left">Mot de passe oublié ?</a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="opacity-0 animate-fade-in-up anim-delay-600">
+                        <button type="submit" class="w-full sm:w-auto bg-bankNavy hover:bg-[#06182a] text-white text-xs font-bold py-4 px-10 rounded-xl shadow-lg hover:shadow-xl hover:shadow-bankNavy/30 hover:-translate-y-1 active:translate-y-0 active:shadow-md mt-4 transition-all duration-300">
+                            Se connecter
+                        </button>
+                    </div>
+                </form>
+
+                <div class="hidden">
+                    {% if messages or form.non_field_errors %}
+                    <div id="login-errors-source">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div id="login-errors" class="hidden mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 opacity-0 animate-fade-in-up anim-delay-700"></div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-[11px] font-semibold text-slate-400 opacity-0 animate-fade-in-up anim-delay-700 leading-relaxed">
+                © 2026 &nbsp;&nbsp; ASIMS &nbsp;•&nbsp; All Rights Reserved
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==================== RIGHT SIDE (Showcase/Cards) ==================== -->
+    <div class="hidden lg:flex w-full lg:w-1/2 bg-pattern relative p-10 lg:p-16 flex-col overflow-hidden border-l border-slate-100 justify-between min-h-screen opacity-0 animate-fade-in-up anim-delay-200">
+        
+        <!-- Top Nav -->
+        <div class="flex justify-end items-center space-x-8 text-sm font-medium z-20">
+            <a href="#" class="text-slate-500 hover:text-bankNavy">Support IT</a>
+            <a href="#" class="text-slate-500 hover:text-bankNavy">Documentation</a>
+            <a href="#" class="text-slate-500 hover:text-bankNavy">État du réseau</a>
+            <button class="p-2 text-slate-400 hover:text-bankNavy hover:bg-slate-200/50 rounded-full transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+        </div>
+
+        
+        <div class="flex-grow relative mt-10">
+
+            <!-- 1. Central Card: ATM Status -->
+            <div class="absolute top-1/2 left-1/2 transform w-80 bg-bankNavy rounded-2xl p-6 shadow-2xl z-10 border border-white/10 anim-float-center hover-pause-center cursor-pointer transition-all duration-300">
+                <!-- Icon -->
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center border border-white/5">
+                        <svg class="w-5 h-5 text-bankBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                    </div>
+                    <span class="ml-3 text-white/70 text-xs font-semibold uppercase tracking-wider">Réseau GAB</span>
+                </div>
+                <div class="text-white text-4xl font-light mb-1 tracking-tight">324 <span class="text-white/30 text-lg">/ 330</span></div>
+                <div class="text-bankBlue text-xs font-medium mb-8">GAB en ligne</div>
+                
+                <div class="flex justify-between items-end border-t border-white/10 pt-4">
+                    <div>
+                        <div class="text-white/50 text-[10px] uppercase mb-1">Disponibilité</div>
+                        <div class="text-white font-mono text-sm">98.4%</div>
+                    </div>
+                    <!-- Status pulse - Secured network badge -->
+                    <div class="flex items-center space-x-2 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Réseau sécurisé</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incident Notification -->
+            <div class="absolute top-12 right-10 bg-white rounded-2xl p-5 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] w-64 z-20 border border-slate-100 anim-float-top-right hover-pause cursor-pointer transition-all duration-300">
+                <div class="flex justify-between items-start mb-3">
+                    <span class="bg-red-100 text-red-600 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">12 incidents ouverts</span>
+                    <span class="text-[10px] text-slate-400 font-medium">Aujourd'hui</span>
+                </div>
+                <h3 class="text-sm font-bold text-slate-800 mb-1">Alertes Actives</h3>
+                <p class="text-[11px] text-slate-500 mb-4">GAB Rabat-Centre : Erreur lecteur de carte (E-402).</p>
+                <div class="flex justify-between items-center">
+                    <div class="flex -space-x-2">
+                        <!-- Tech avatars -->
+                        <div class="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[9px] font-bold text-slate-600">JS</div>
+                        <div class="w-7 h-7 rounded-full bg-bankBlue/20 border-2 border-white flex items-center justify-center text-[9px] font-bold text-bankNavy">MA</div>
+                    </div>
+                    <button class="text-[10px] text-bankNavy font-bold hover:underline">Affecter →</button>
+                </div>
+            </div>
+
+            <!-- 3. Chart Card (Bottom Left) -->
+            <div class="absolute bottom-32 left-8 bg-white rounded-2xl p-5 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] w-52 z-20 border border-slate-100 anim-float-bottom-left hover-pause cursor-pointer transition-all duration-300">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Interventions</span>
+                    <span class="bg-amber-100 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded">6 en cours</span>
+                </div>
+                <div class="flex items-end justify-between h-14 mb-3 space-x-2">
+                    <div class="w-3 bg-bankNavy/20 hover:bg-bankNavy transition-colors h-6 rounded-sm"></div>
+                    <div class="w-3 bg-bankBlue h-10 rounded-sm relative"><span class="absolute -top-4 left-1/2 transform -translate-x-1/2 text-[8px] font-bold text-bankNavy">6</span></div>
+                    <div class="w-3 bg-bankNavy h-14 rounded-sm relative shadow-sm"></div>
+                    <div class="w-3 bg-bankNavy/20 hover:bg-bankNavy transition-colors h-8 rounded-sm"></div>
+                    <div class="w-3 bg-bankBlue h-5 rounded-sm"></div>
+                    <div class="w-3 bg-bankNavy/10 h-7 rounded-sm"></div>
+                </div>
+                <div class="text-[9px] text-slate-400 text-center font-medium">Techniciens en mission</div>
+            </div>
+
+            <!-- 4. Last Action Widget (Bottom Right) -->
+            <div class="absolute bottom-8 right-10 bg-white rounded-2xl p-4 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.1)] w-72 z-20 border border-slate-100 anim-float-bottom-right hover-pause cursor-pointer transition-all duration-300">
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="text-[11px] font-bold text-slate-800"> Cassette faible</h4>
+                            <span class="text-[9px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded">9 GAB</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 leading-tight">Niveau d'encaisse critique détecté sur 9 distributeurs régionaux.</p>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-3 pt-3 border-t border-slate-50">
+                    <button class="text-bankBlue hover:text-bankNavy text-[10px] font-bold transition-colors">
+                        Planifier approvisionnement
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Password visibility  -->
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordInput.classList.add('text-visible');
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                `;
+            } else {
+                passwordInput.type = 'password';
+                passwordInput.classList.remove('text-visible');
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                `;
+            }
+        }
+
+        const loginErrorsSource = document.getElementById('login-errors-source');
+        const loginErrors = document.getElementById('login-errors');
+        if (loginErrorsSource && loginErrors) {
+            const errorText = loginErrorsSource.innerHTML.trim();
+            const hasTemplateCode = errorText.includes('{%') || errorText.includes('{{');
+            if (errorText && !hasTemplateCode) {
+                loginErrors.innerHTML = errorText;
+                loginErrors.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
