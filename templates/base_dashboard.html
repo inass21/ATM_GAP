@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ASIMS{% endblock %}
+
+    </title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bankNavy: '#0A2540',
+                        bankBlue: '#639FAB',
+                        appBg: '#F9FAFB',
+                        borderGray: '#E5E7EB',
+                        success: '#10B981',
+                        danger: '#EF4444',
+                        warning: '#F59E0B'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body class="bg-[#F6F8FB]">
+
+<div class="flex h-screen overflow-hidden">
+
+    {% include "partials/sidebar.html" %}
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+        {% include "partials/navbar.html" %}
+
+        <main class="flex-1 overflow-y-auto p-8">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+</div>
+
+{% block extra_js %}
+{% endblock %}
+
+</body>
+
+</html>

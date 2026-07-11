@@ -1,0 +1,129 @@
+<aside class="w-64 bg-white border-r border-borderGray flex flex-col shrink-0 shadow-sm">
+
+    <!-- Logo -->
+    <div class="h-20 flex items-center px-6 border-b border-borderGray">
+
+        <svg class="w-10 h-10 text-bankNavy shrink-0"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2.5"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+
+        <div class="ml-3">
+            <h1 class="text-lg font-bold text-bankNavy">ASIMS</h1>
+            <p class="text-[10px] uppercase tracking-[0.25em] text-gray-400">
+                Supervision Platform
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 py-5">
+
+        <a href="#"
+           class="flex items-center h-12 px-6 text-gray-500 hover:bg-gray-50 hover:text-bankNavy border-l-4 border-transparent transition-all">
+
+            <i class="fa-solid fa-chart-line text-[17px] w-6 text-center"></i>
+
+            <span class="ml-4 text-sm font-medium">
+                Dashboard
+            </span>
+
+        </a>
+
+        <a href="{% url 'gab:liste_gab' %}"
+           class="flex items-center h-12 px-6 bg-gray-50 border-l-4 border-bankBlue text-bankNavy">
+
+            <i class="fa-solid fa-server text-[17px] w-6 text-center"></i>
+
+            <span class="ml-4 text-sm font-semibold">
+                Parc GAB
+            </span>
+
+        </a>
+
+        <a href="#"
+           class="flex items-center h-12 px-6 text-gray-500 hover:bg-gray-50 hover:text-bankNavy border-l-4 border-transparent transition-all relative">
+
+            <div class="relative w-6 flex justify-center">
+
+                <i class="fa-solid fa-triangle-exclamation text-[17px]"></i>
+
+                <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
+
+            </div>
+
+            <span class="ml-4 text-sm font-medium">
+                Incidents
+            </span>
+
+        </a>
+
+        <a href="#"
+           class="flex items-center h-12 px-6 text-gray-500 hover:bg-gray-50 hover:text-bankNavy border-l-4 border-transparent transition-all">
+
+            <i class="fa-solid fa-wrench text-[17px] w-6 text-center"></i>
+
+            <span class="ml-4 text-sm font-medium">
+                Interventions
+            </span>
+
+        </a>
+
+        <a href="#"
+           class="flex items-center h-12 px-6 text-gray-500 hover:bg-gray-50 hover:text-bankNavy border-l-4 border-transparent transition-all">
+
+            <i class="fa-solid fa-envelope text-[17px] w-6 text-center"></i>
+
+            <span class="ml-4 text-sm font-medium">
+                Relances
+            </span>
+
+        </a>
+
+        <a href="#"
+           class="flex items-center h-12 px-6 text-gray-500 hover:bg-gray-50 hover:text-bankNavy border-l-4 border-transparent transition-all">
+
+            <i class="fa-solid fa-chart-column text-[17px] w-6 text-center"></i>
+
+            <span class="ml-4 text-sm font-medium">
+                Rapports
+            </span>
+
+        </a>
+
+        <a href="#"
+           class="flex items-center h-12 px-6 text-gray-500 hover:bg-gray-50 hover:text-bankNavy border-l-4 border-transparent transition-all">
+
+            <i class="fa-solid fa-users text-[17px] w-6 text-center"></i>
+
+            <span class="ml-4 text-sm font-medium">
+                Utilisateurs
+            </span>
+
+        </a>
+
+    </nav>
+
+    <!-- Bottom -->
+    <div class="border-t border-borderGray p-4">
+
+        <a href="#"
+           class="flex items-center h-11 px-2 text-gray-500 hover:text-bankNavy transition-all">
+
+            <i class="fa-solid fa-gear text-[17px] w-6 text-center"></i>
+
+            <span class="ml-4 text-sm font-medium">
+                Paramètres
+            </span>
+
+        </a>
+
+    </div>
+
+</aside>

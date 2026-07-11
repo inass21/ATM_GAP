@@ -1,0 +1,506 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Parc GAB - ASIMS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-container::-webkit-scrollbar { height: 6px; width: 6px; }
+    .table-container::-webkit-scrollbar-track { background: #f9fafb; }
+    .table-container::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+    .drawer-transition { transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s linear; }
+    #gab-drawer { -ms-overflow-style: none; scrollbar-width: none; }
+    #gab-drawer::-webkit-scrollbar { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">
+        <a href="#" class="hover:text-bankBlue transition-colors">Accueil</a>
+        <span class="mx-1">/</span>
+        <span class="text-gray-600">Parc GAB</span>
+    </div>
+
+    <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight mb-1">Parc GAB</h1>
+            <p class="text-sm text-gray-500">Gestion et supervision des guichets automatiques bancaires</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'gab:liste_gab' %}" class="h-10 px-4 bg-white border border-borderGray hover:bg-gray-50 text-gray-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-rotate text-gray-400"></i>
+                <span>Reset</span>
+            </a>
+            <button id="gab-filter-submit" type="button" onclick="document.getElementById('gab-filter-form').submit()" class="h-10 px-4 bg-bankNavy hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass text-white"></i>
+                <span>Rechercher</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-4">
+        <div class="bg-white h-[84px] px-5 py-4 rounded-lg border border-borderGray flex flex-col justify-center relative overflow-hidden group">
+            <i class="fa-solid fa-layer-group absolute -right-2 -bottom-2 text-6xl text-gray-200 opacity-20 pointer-events-none"></i>
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Total GAB</span>
+            <span class="text-2xl font-bold text-gray-900 tracking-tight">{{ page_obj.paginator.count }}</span>
+        </div>
+        <div class="bg-white h-[84px] px-5 py-4 rounded-lg border border-borderGray flex flex-col justify-center relative overflow-hidden group">
+            <i class="fa-solid fa-check-circle absolute -right-2 -bottom-2 text-6xl text-gray-200 opacity-20 pointer-events-none"></i>
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Opérationnels</span>
+            <span class="text-2xl font-bold text-gray-900 tracking-tight">{{ operational_count }}</span>
+        </div>
+        <div class="bg-white h-[84px] px-5 py-4 rounded-lg border border-borderGray flex flex-col justify-center relative overflow-hidden group">
+            <i class="fa-solid fa-chart-pie absolute -right-2 -bottom-2 text-6xl text-gray-200 opacity-20 pointer-events-none"></i>
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Disponibilité</span>
+            <span class="text-2xl font-bold text-bankNavy tracking-tight">
+                {{ availability }}<span class="text-lg text-gray-500 ml-0.5">%</span>
+            </span>
+        </div>
+        <div class="bg-white h-[84px] px-5 py-4 rounded-lg border border-borderGray flex flex-col justify-center relative overflow-hidden group">
+            <i class="fa-solid fa-triangle-exclamation absolute -right-2 -bottom-2 text-6xl text-gray-200 opacity-20 pointer-events-none"></i>
+            <span class="text-[11px] font-semibold text-red-500 uppercase tracking-wider mb-1">Critiques</span>
+            <span class="text-2xl font-bold text-red-600 tracking-tight">{{ critical_count }}</span>
+        </div>
+    </div>
+
+    <form id="gab-filter-form" method="get" class="bg-white border border-borderGray rounded-t-lg p-4 grid grid-cols-1 xl:grid-cols-5 gap-4">
+        <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-0.5">Terminal</label>
+            <input name="terminal" value="{{ request.GET.terminal }}" type="text" placeholder="Ex: T001" class="h-10 px-3 border border-borderGray rounded-lg text-sm focus:outline-none focus:border-bankBlue">
+        </div>
+        <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-0.5">Nom GAB</label>
+            <input name="nom" value="{{ request.GET.nom }}" type="text" placeholder="Ex: Agence Hassan II" class="h-10 px-3 border border-borderGray rounded-lg text-sm focus:outline-none focus:border-bankBlue">
+        </div>
+        <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-0.5">Ville</label>
+            <input name="ville" value="{{ request.GET.ville }}" type="text" placeholder="Ex: Casablanca" class="h-10 px-3 border border-borderGray rounded-lg text-sm focus:outline-none focus:border-bankBlue">
+        </div>
+        <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-0.5">Fournisseur</label>
+            <select name="fournisseur" class="h-10 px-3 border border-borderGray rounded-lg text-sm focus:outline-none focus:border-bankBlue bg-white text-gray-700">
+                <option value="">Tous</option>
+                {% for fournisseur in fournisseurs %}
+                    <option value="{{ fournisseur.id_fournisseur }}" {% if request.GET.fournisseur == fournisseur.id_fournisseur|stringformat:"s" %}selected{% endif %}>{{ fournisseur.nom_fournisseur }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="flex flex-col">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-0.5">État</label>
+            <select name="etat" class="h-10 px-3 border border-borderGray rounded-lg text-sm focus:outline-none focus:border-bankBlue bg-white text-gray-700">
+                <option value="">Tous les états</option>
+                {% for value,label in etats %}
+                    <option value="{{ value }}" {% if request.GET.etat == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <div class="h-9 bg-gray-50 border-x border-b border-borderGray flex items-center px-4 justify-between text-[11px] font-medium text-gray-500 select-none">
+        <div class="flex items-center space-x-3">
+            <span class="flex items-center text-green-600"><i class="fa-solid fa-circle-check mr-1.5 text-xs"></i> Synchronisation en temps réel</span>
+            <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+            <span class="text-xs font-semibold text-gray-400">Double-cliquez sur une ligne pour gérer le terminal</span>
+        </div>
+        <div><span class="font-bold text-gray-700">{{ page_obj.paginator.count }}</span> GAB Monitorés</div>
+    </div>
+
+    <div class="bg-white border-x border-borderGray table-container overflow-x-auto">
+        <table class="w-full text-left whitespace-nowrap">
+            <thead class="bg-gray-50 border-y border-borderGray sticky top-0">
+                <tr>
+                    <th class="py-2.5 px-4 text-[10px] font-semibold text-gray-600 uppercase tracking-wider w-24">Terminal</th>
+                    <th class="py-2.5 px-4 text-[10px] font-semibold text-gray-600 uppercase tracking-wider">Nom GAB</th>
+                    <th class="py-2.5 px-4 text-[10px] font-semibold text-gray-600 uppercase tracking-wider">Ville</th>
+                    <th class="py-2.5 px-4 text-[10px] font-semibold text-gray-600 uppercase tracking-wider">Fournisseur</th>
+                    <th class="py-2.5 px-4 text-[10px] font-semibold text-gray-600 uppercase tracking-wider text-center">État</th>
+                    <th class="py-2.5 px-4 text-[10px] font-semibold text-gray-600 uppercase tracking-wider">Dernière synchro</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-borderGray text-sm">
+                {% for gab in gabs %}
+                    <tr data-gab-terminal="{{ gab.terminal }}" class="hover:bg-gray-50/70 transition-colors duration-150 cursor-pointer select-none gab-row">
+                        <td class="py-1.5 px-4 font-semibold text-gray-900">{{ gab.terminal }}</td>
+                        <td class="py-1.5 px-4 font-medium text-gray-700">{{ gab.nom_gab }}</td>
+                        <td class="py-1.5 px-4 text-gray-500 text-xs">{{ gab.ville }}</td>
+                        <td class="py-1.5 px-4 text-gray-500 font-medium text-sm">
+                            {% if gab.fournisseur %}{{ gab.fournisseur.nom_fournisseur }}{% else %}-{% endif %}
+                        </td>
+                        <td class="py-1.5 px-4 text-center">
+                            {% if gab.etat == "CRITIQUE" %}
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200 uppercase">Critique</span>
+                            {% elif gab.etat == "OPERATIONNEL" or gab.etat == "OPÉRATIONNEL" %}
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-green-100 text-green-700 border border-green-200 uppercase">Opérationnel</span>
+                            {% else %}
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-orange-100 text-orange-700 border border-orange-200 uppercase">{{ gab.get_etat_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-1.5 px-4 text-gray-500 font-mono text-[10px] leading-snug">
+                            {% if gab.dernier_synchro %}
+                                {{ gab.dernier_synchro|date:"d/m/Y" }}<br>
+                                <span class="text-gray-400">{{ gab.dernier_synchro|date:"H:i" }}</span>
+                            {% else %}
+                                <span class="text-gray-400">Non renseigné</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-6 text-center text-gray-500">Aucun GAB trouvé avec ces filtres.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bg-white px-4 py-2 border-b border-x border-borderGray rounded-b-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span class="text-[11px] text-gray-500 font-medium">Affichage de {{ page_obj.start_index }} à {{ page_obj.end_index }} sur {{ page_obj.paginator.count }} GAB</span>
+        <div class="flex items-center space-x-1">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}" class="px-2.5 py-1 text-[11px] font-medium text-gray-600 border border-borderGray rounded hover:bg-gray-100 transition-colors">Précédent</a>
+            {% else %}
+                <button disabled class="px-2.5 py-1 text-[11px] font-medium text-gray-400 border border-transparent rounded cursor-not-allowed">Précédent</button>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="w-8 h-8 flex items-center justify-center text-[11px] font-semibold text-white bg-bankNavy rounded">{{ num }}</span>
+                {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                    <a href="?page={{ num }}{% if query_string %}&{{ query_string }}{% endif %}" class="w-8 h-8 flex items-center justify-center text-[11px] font-medium text-gray-600 hover:bg-gray-100 rounded transition-colors">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}" class="px-2.5 py-1 text-[11px] font-medium text-gray-600 border border-borderGray rounded hover:bg-gray-100 transition-colors">Suivant</a>
+            {% else %}
+                <button disabled class="px-2.5 py-1 text-[11px] font-medium text-gray-400 border border-transparent rounded cursor-not-allowed">Suivant</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% include "gab/partials/drawer_gab.html" %}
+{% endblock %}
+{% block extra_js %}
+<script>
+    let drawer;
+    let backdrop;
+    let drawerTabs;
+    let drawerSections;
+    let gabRows;
+
+    function initGabInteractions() {
+        drawer = document.getElementById("gab-drawer");
+        backdrop = document.getElementById("gab-drawer-backdrop");
+        drawerTabs = Array.from(document.querySelectorAll(".drawer-tab"));
+        drawerSections = {
+            infos: document.getElementById("drawer-content-infos"),
+            incidents: document.getElementById("drawer-content-incidents"),
+            interventions: document.getElementById("drawer-content-interventions"),
+            relances: document.getElementById("drawer-content-relances"),
+            historique: document.getElementById("drawer-content-historique"),
+        };
+        gabRows = Array.from(document.querySelectorAll("tr[data-gab-terminal]"));
+        gabRows.forEach(row => {
+            row.addEventListener("click", () => openDrawer(row.dataset.gabTerminal));
+        });
+
+        const gabFilterSubmit = document.getElementById("gab-filter-submit");
+        if (gabFilterSubmit) {
+            gabFilterSubmit.addEventListener("click", event => {
+                event.preventDefault();
+                const form = document.getElementById("gab-filter-form");
+                if (form) form.submit();
+            });
+        }
+
+        const closeButton = document.getElementById("drawer-close-button");
+        if (closeButton) {
+            closeButton.addEventListener("click", closeDrawer);
+        }
+
+        const drawerTabsButtons = Array.from(document.querySelectorAll(".drawer-tab"));
+        drawerTabsButtons.forEach(button => {
+            button.addEventListener("click", () => switchTab(button.dataset.tab));
+        });
+
+        if (backdrop) {
+            backdrop.addEventListener("click", closeDrawer);
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initGabInteractions);
+    } else {
+        initGabInteractions();
+    }
+    document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+        closeDrawer();
+    }
+});
+
+    window.closeDrawer = closeDrawer;
+    window.switchTab = switchTab;
+
+    function openDrawer(terminal) {
+        drawer = drawer || document.getElementById("gab-drawer");
+        backdrop = backdrop || document.getElementById("gab-drawer-backdrop");
+        if (!drawer) {
+            console.warn("Drawer element not found, aborting openDrawer");
+            return;
+        }
+        setDrawerLoading();
+        drawer.classList.remove("translate-x-full");
+        drawer.classList.remove("hidden");
+        drawer.classList.add("translate-x-0");
+        if (backdrop) {
+            backdrop.classList.remove("opacity-0", "pointer-events-none");
+            backdrop.classList.add("opacity-100");
+        }
+        switchTab("infos");
+        loadGabDetail(terminal);
+    }
+
+    function closeDrawer() {
+        if (!drawer) return;
+
+        drawer.classList.remove("translate-x-0");
+        drawer.classList.add("translate-x-full");
+
+    if (backdrop) {
+        backdrop.classList.remove("opacity-100");
+        backdrop.classList.add("opacity-0", "pointer-events-none");
+    }
+}
+
+    function switchTab(tabName) {
+        if (!drawerTabs || !drawerSections) return;
+        drawerTabs.forEach(button => {
+            button.classList.toggle("bg-bankBlue/10", button.dataset.tab === tabName);
+            button.classList.toggle("text-bankNavy", button.dataset.tab === tabName);
+            button.classList.toggle("text-gray-600", button.dataset.tab !== tabName);
+            button.classList.toggle("font-semibold", button.dataset.tab === tabName);
+        });
+
+        Object.keys(drawerSections).forEach(key => {
+            const section = drawerSections[key];
+            if (section) {
+                section.classList.toggle("hidden", key !== tabName);
+            }
+        });
+    }
+
+    function setDrawerLoading() {
+        const drawerTerminal = document.getElementById("drawer-terminal");
+        const drawerName = document.getElementById("drawer-name");
+        const drawerMeta = document.getElementById("drawer-meta");
+        const drawerCommunication = document.getElementById("drawer-communication");
+        const drawerStatusDot = document.getElementById("drawer-status-dot");
+        const drawerStatusText = document.getElementById("drawer-status-text");
+        const drawerStatus = document.getElementById("drawer-status");
+        const drawerInfoTerminal = document.getElementById("drawer-info-terminal");
+        const drawerInfoName = document.getElementById("drawer-info-name");
+        const drawerInfoVille = document.getElementById("drawer-info-ville");
+        const drawerInfoAgence = document.getElementById("drawer-info-agence");
+        const drawerInfoFournisseur = document.getElementById("drawer-info-fournisseur");
+        const drawerInfoIp = document.getElementById("drawer-info-ip");
+        const drawerInfoType = document.getElementById("drawer-info-type");
+        const drawerInfoSerie = document.getElementById("drawer-info-serie");
+        const drawerInfoSync = document.getElementById("drawer-info-sync");
+        const drawerInfoAdresse = document.getElementById("drawer-info-adresse");
+        const drawerActionIncident = document.getElementById("drawer-action-incident");
+        const drawerActionIntervention = document.getElementById("drawer-action-intervention");
+        const drawerActionRelance = document.getElementById("drawer-action-relance");
+
+        if (drawerTerminal) drawerTerminal.textContent = "Loading...";
+        if (drawerName) drawerName.textContent = "";
+        if (drawerMeta) drawerMeta.textContent = "";
+        if (drawerCommunication) drawerCommunication.textContent = "Dernière communication —";
+        if (drawerStatusDot) drawerStatusDot.className = "mr-2 inline-flex h-2.5 w-2.5 rounded-full bg-slate-400";
+        if (drawerStatusText) drawerStatusText.textContent = "Loading...";
+        if (drawerStatus) drawerStatus.className = "inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold border-borderGray text-gray-500";
+        if (drawerInfoTerminal) drawerInfoTerminal.textContent = "Loading...";
+        if (drawerInfoName) drawerInfoName.textContent = "Loading...";
+        if (drawerInfoVille) drawerInfoVille.textContent = "Loading...";
+        if (drawerInfoAgence) drawerInfoAgence.textContent = "Loading...";
+        if (drawerInfoFournisseur) drawerInfoFournisseur.textContent = "Loading...";
+        if (drawerInfoIp) drawerInfoIp.textContent = "Loading...";
+        if (drawerInfoType) drawerInfoType.textContent = "Loading...";
+        if (drawerInfoSerie) drawerInfoSerie.textContent = "Loading...";
+        if (drawerInfoSync) drawerInfoSync.textContent = "Loading...";
+        if (drawerInfoAdresse) drawerInfoAdresse.textContent = "Loading...";
+        if (drawerActionIncident) drawerActionIncident.disabled = true;
+        if (drawerActionIntervention) drawerActionIntervention.disabled = true;
+        if (drawerActionRelance) drawerActionRelance.disabled = true;
+    }
+
+    function parseFrenchDateTime(value) {
+        if (!value || value === "—") {
+            return null;
+        }
+        const [datePart, timePart] = value.split(" ");
+        if (!datePart || !timePart) return null;
+        const [day, month, year] = datePart.split("/").map(Number);
+        const [hour, minute] = timePart.split(":").map(Number);
+        return new Date(year, month - 1, day, hour, minute);
+    }
+
+    function formatRelativeTime(value) {
+        const date = parseFrenchDateTime(value);
+        if (!date) return "—";
+        const diff = Date.now() - date.getTime();
+        const minutes = Math.floor(diff / 60000);
+        if (minutes < 1) return "À l'instant";
+        if (minutes === 1) return "1 min ago";
+        if (minutes < 60) return `${minutes} min ago`;
+        const hours = Math.floor(minutes / 60);
+        return hours === 1 ? "1h ago" : `${hours}h ago`;
+    }
+
+    function loadGabDetail(terminal) {
+        const url = `/gab/api/${terminal}/`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error("Impossible de charger le GAB");
+                return response.json();
+            })
+            .then(data => populateDrawer(data))
+            .catch(() => {
+                const setText = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = value;
+                };
+                const setClass = (id, className) => {
+                    const el = document.getElementById(id);
+                    if (el) el.className = className;
+                };
+                const setDisabled = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.disabled = value;
+                };
+
+                setText("drawer-terminal", terminal);
+                setText("drawer-name", "Impossible de charger les détails");
+                setText("drawer-meta", "");
+                setText("drawer-communication", "Dernière communication —");
+                setText("drawer-status-text", "Erreur");
+                setClass("drawer-status-dot", "mr-2 inline-flex h-2.5 w-2.5 rounded-full bg-red-500");
+                setClass("drawer-status", "inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold border-red-200 bg-red-50 text-red-700");
+                [
+                    "drawer-info-terminal",
+                    "drawer-info-name",
+                    "drawer-info-ville",
+                    "drawer-info-agence",
+                    "drawer-info-fournisseur",
+                    "drawer-info-ip",
+                    "drawer-info-type",
+                    "drawer-info-serie",
+                    "drawer-info-sync",
+                    "drawer-info-adresse"
+                ].forEach(id => setText(id, "—"));
+                setDisabled("drawer-action-incident", true);
+                setDisabled("drawer-action-intervention", true);
+                setDisabled("drawer-action-relance", true);
+            });
+    }
+
+    function populateDrawer(data) {
+        const terminalLabel = data.terminal && data.terminal.toString().startsWith("GAB-") ? data.terminal : `GAB-${data.terminal}`;
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+        const setHTML = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = value;
+        };
+        const setClass = (id, className) => {
+            const el = document.getElementById(id);
+            if (el) el.className = className;
+        };
+        const el = id => document.getElementById(id);
+
+        setText("drawer-terminal", terminalLabel);
+        setText("drawer-name", `${data.libelle_agence !== "—" ? data.libelle_agence : data.nom_gab}${data.ville ? ` ${data.ville}` : ""}`);
+        setHTML("drawer-meta", `
+            <span>${data.ville}</span>
+            <span class="text-slate-300">•</span>
+            <span>${data.fournisseur}</span>
+        `);
+
+        const status = el("drawer-status");
+        const statusDot = el("drawer-status-dot");
+        const statusText = el("drawer-status-text");
+        if (statusText) statusText.textContent = data.etat_display;
+        if (status) status.className = "inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold";
+        if (statusDot) statusDot.className = "mr-2 inline-flex h-2.5 w-2.5 rounded-full";
+
+        const syncDate = parseFrenchDateTime(data.derniere_synchronisation);
+        const isOnline = syncDate ? (Date.now() - syncDate.getTime()) <= 5 * 60000 : false;
+        setText("drawer-communication", `Dernière communication • ${formatRelativeTime(data.derniere_synchronisation)}`);
+
+        if (status && statusDot) {
+            if (data.etat === "CRITIQUE") {
+                status.classList.add("border-red-200", "bg-red-50", "text-red-700");
+                statusDot.classList.add("bg-red-500");
+            } else if (data.etat === "OPERATIONNEL") {
+                status.classList.add("border-emerald-200", "bg-emerald-50", "text-emerald-700");
+                statusDot.classList.add("bg-emerald-500");
+            } else {
+                status.classList.add("border-orange-200", "bg-orange-50", "text-orange-700");
+                statusDot.classList.add("bg-orange-500");
+            }
+        }
+
+        if (statusText) {
+            statusText.textContent = data.etat_display;
+        }
+
+        setText("drawer-info-terminal", data.terminal);
+        setText("drawer-info-name", data.nom_gab);
+        setText("drawer-info-ville", data.ville);
+        setText("drawer-info-agence", data.libelle_agence);
+        setText("drawer-info-fournisseur", data.fournisseur);
+        setText("drawer-info-ip", data.ip_adresse_gab);
+        setText("drawer-info-type", data.type_gab);
+        setText("drawer-info-serie", data.numero_serie);
+        setText("drawer-info-sync", data.derniere_synchronisation);
+        setText("drawer-info-adresse", data.adresse_gab);
+
+        const incidentBtn = el("drawer-action-incident");
+        const interventionBtn = el("drawer-action-intervention");
+        const relanceBtn = el("drawer-action-relance");
+
+        if (incidentBtn) incidentBtn.disabled = data.etat === "PASSIF";
+        if (interventionBtn) interventionBtn.disabled = data.etat === "HORS_SERVICE";
+        if (relanceBtn) relanceBtn.disabled = false;
+
+        if (incidentBtn) {
+            incidentBtn.classList.toggle("opacity-50", data.etat === "PASSIF");
+            incidentBtn.classList.toggle("cursor-not-allowed", data.etat === "PASSIF");
+        }
+        if (interventionBtn) {
+            interventionBtn.classList.toggle("opacity-50", data.etat === "HORS_SERVICE");
+            interventionBtn.classList.toggle("cursor-not-allowed", data.etat === "HORS_SERVICE");
+        }
+
+        [
+            { id: "drawer-tab-incidents-badge", value: data.incidents_count },
+            { id: "drawer-tab-interventions-badge", value: data.interventions_count },
+            { id: "drawer-tab-relances-badge", value: data.relances_count }
+        ].forEach(({ id, value }) => {
+            const badge = el(id);
+            if (badge) {
+                if (value && value > 0) {
+                    badge.textContent = value;
+                    badge.classList.remove("hidden");
+                } else {
+                    badge.classList.add("hidden");
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

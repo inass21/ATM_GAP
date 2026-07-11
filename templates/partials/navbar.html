@@ -1,0 +1,71 @@
+<header class="h-16 bg-white border-b border-borderGray flex items-center justify-between px-8">
+
+    <!-- Left -->
+    <div class="flex items-center gap-6">
+
+        <!-- Search -->
+        <div class="relative">
+
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+
+            <input
+                type="text"
+                placeholder="Rechercher un GAB..."
+                class="w-96 h-11 pl-11 pr-4 rounded-lg border border-borderGray bg-gray-50 text-sm
+                       focus:outline-none focus:ring-2 focus:ring-bankBlue focus:bg-white transition">
+
+        </div>
+
+    </div>
+
+    <!-- Right -->
+    <div class="flex items-center gap-6">
+
+        <!-- Etat système -->
+        <div class="flex items-center gap-2 text-sm text-green-600 font-medium">
+
+            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+
+            <span>Réseau opérationnel</span>
+
+        </div>
+
+        <!-- Notification -->
+        <button class="relative w-10 h-10 rounded-lg hover:bg-gray-100 transition">
+
+            <i class="fa-regular fa-bell text-lg text-gray-600"></i>
+
+            <span
+                class="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 text-white
+                       text-[10px] flex items-center justify-center font-semibold">
+                3
+            </span>
+
+        </button>
+
+        <!-- User -->
+        <div class="flex items-center gap-3 pl-5 border-l border-borderGray">
+
+            <div
+                class="w-10 h-10 rounded-full bg-bankNavy text-white flex items-center justify-center font-bold">
+                AD
+            </div>
+
+            <div>
+                <p class="text-sm font-semibold text-gray-800">
+                    Superviseur Principal
+                </p>
+                <p class="text-xs text-gray-500">
+                    Administrateur
+                </p>
+            </div>
+
+            <button class="text-gray-400 hover:text-bankNavy">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+</header>

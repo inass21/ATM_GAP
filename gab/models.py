@@ -34,16 +34,21 @@ class Filiale(models.Model):
     
 class GAB(models.Model):
 
+    ETAT_OPERATIONNEL = "OPERATIONNEL"
+    ETAT_HORS_SERVICE = "HORS_SERVICE"
+    ETAT_CRITIQUE = "CRITIQUE"
+    ETAT_PASSIF = "PASSIF"
+    ETAT_SUPERVISION = "SUPERVISION"
+
     ETAT_CHOICES = [
-        ("OPERATIONNEL", "Opérationnel"),
-        ("HORS_SERVICE", "Hors service"),
-        ("CRITIQUE", "Critique"),
-        ("PASSIF", "Passif"),
-        ("SUPERVISION", "En supervision"),
+        (ETAT_OPERATIONNEL, "Opérationnel"),
+        (ETAT_HORS_SERVICE, "Hors service"),
+        (ETAT_CRITIQUE, "Critique"),
+        (ETAT_PASSIF, "Passif"),
+        (ETAT_SUPERVISION, "En supervision"),
     ]
 
     terminal = models.IntegerField(primary_key=True)
-
     numero_serie = models.CharField(max_length=50, blank=True, null=True)
 
     nom_gab = models.CharField(max_length=150, blank=True, null=True)

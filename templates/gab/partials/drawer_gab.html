@@ -1,0 +1,148 @@
+<div id="gab-drawer-backdrop"
+     class="fixed inset-0 z-40 bg-slate-900/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+<aside id="gab-drawer"
+       class="fixed inset-y-0 right-0 z-50 w-full max-w-xl translate-x-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 scrollbar-none scroll-smooth">
+    <div class="flex h-full min-h-screen flex-col">
+        <div class="flex items-start justify-between border-b border-borderGray p-6">
+            <div>
+                <p id="drawer-subtitle" class="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">Détails GAB</p>
+                <h2 id="drawer-terminal" class="text-3xl font-semibold text-gray-900 tracking-tight"></h2>
+                <p id="drawer-name" class="mt-1 text-sm font-semibold text-gray-700"></p>
+                <div id="drawer-meta" class="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500"></div>
+                <p id="drawer-communication" class="mt-4 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500"></p>
+            </div>
+            <button id="drawer-close-button" type="button" class="rounded-lg bg-slate-100 p-3 text-gray-600 hover:bg-slate-200 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="px-6 pb-6">
+            <div id="drawer-status" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold">
+                <span id="drawer-status-dot" class="mr-2 inline-flex h-2.5 w-2.5 rounded-full bg-slate-400"></span>
+                <span id="drawer-status-text"></span>
+            </div>
+        </div>
+
+        <div class="border-b border-borderGray px-6">
+            <nav class="flex flex-wrap gap-2 overflow-x-auto pb-2">
+                <button type="button" class="drawer-tab active-tab rounded-full px-4 py-2 text-sm font-semibold text-bankNavy bg-bankBlue/10" data-tab="infos">Informations</button>
+                <button type="button" class="drawer-tab rounded-full px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-slate-100" data-tab="incidents">Incidents <span id="drawer-tab-incidents-badge" class="ml-2 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600 hidden">0</span></button>
+                <button type="button" class="drawer-tab rounded-full px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-slate-100" data-tab="interventions">Interventions <span id="drawer-tab-interventions-badge" class="ml-2 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600 hidden">0</span></button>
+                <button type="button" class="drawer-tab rounded-full px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-slate-100" data-tab="relances">Relances <span id="drawer-tab-relances-badge" class="ml-2 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600 hidden">0</span></button>
+                <button type="button" class="drawer-tab rounded-full px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-slate-100" data-tab="historique">Historique</button>
+            </nav>
+        </div>
+
+        <div class="flex-1 px-6 py-6">
+            <section id="drawer-content-infos" class="space-y-6">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">Terminal</p>
+                        <p id="drawer-info-terminal" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">Fournisseur</p>
+                        <p id="drawer-info-fournisseur" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">IP</p>
+                        <p id="drawer-info-ip" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">Ville</p>
+                        <p id="drawer-info-ville" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">Agence</p>
+                        <p id="drawer-info-agence" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">Type</p>
+                        <p id="drawer-info-type" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">N° Série</p>
+                        <p id="drawer-info-serie" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">Dernière synchro</p>
+                        <p id="drawer-info-sync" class="text-sm font-semibold text-gray-900"></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:col-span-2 transition duration-200 hover:border-bankBlue hover:bg-white">
+                        <div class="flex items-center justify-between gap-3">
+                            <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">Adresse</p>
+                        </div>
+                        <div class="border-t border-slate-200 pt-3 text-sm font-semibold text-gray-900 whitespace-pre-line" id="drawer-info-adresse"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="drawer-content-incidents" class="hidden">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                    <p class="text-sm text-gray-600">Aucun incident enregistré pour ce terminal pour le moment.</p>
+                </div>
+            </section>
+
+            <section id="drawer-content-interventions" class="hidden">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                    <p class="text-sm text-gray-600">Aucune intervention enregistrée pour ce terminal pour le moment.</p>
+                </div>
+            </section>
+
+            <section id="drawer-content-relances" class="hidden">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                    <p class="text-sm text-gray-600">Aucune relance enregistrée pour ce terminal pour le moment.</p>
+                </div>
+            </section>
+
+            <section id="drawer-content-historique" class="hidden">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6 space-y-5">
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-1 h-2.5 w-2.5 rounded-full bg-bankBlue"></div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">14:30 — Synchronisation OK</p>
+                                <p class="text-sm text-gray-500">Dernière communication réussie avec le terminal.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="mt-1 h-2.5 w-2.5 rounded-full bg-slate-400"></div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">12:20 — État changé</p>
+                                <p class="text-sm text-gray-500">Passif → Opérationnel.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="mt-1 h-2.5 w-2.5 rounded-full bg-slate-400"></div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">Hier — Relance envoyée</p>
+                                <p class="text-sm text-gray-500">NCR a reçu la relance fournisseur.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="border-t border-borderGray bg-slate-50 px-6 py-5">
+            <div class="space-y-4">
+                <p class="text-sm font-semibold text-gray-900">Actions rapides</p>
+                <div class="grid gap-3">
+                    <button id="drawer-action-incident" type="button" class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-left text-sm font-semibold text-red-700 transition duration-200 ease-out transform hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-triangle-exclamation"></i><span> Déclarer un incident</span></span>
+                    </button>
+                    <button id="drawer-action-intervention" type="button" class="w-full rounded-xl border border-bankNavy/20 bg-bankNavy/5 px-4 py-3 text-left text-sm font-semibold text-bankNavy transition duration-200 ease-out transform hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-tools"></i><span> Planifier intervention</span></span>
+                    </button>
+                    <button id="drawer-action-relance" type="button" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-gray-700 transition duration-200 ease-out transform hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-envelope"></i><span> Créer relance fournisseur</span></span>
+                    </button>
+                    <button id="drawer-action-history" type="button" class="w-full rounded-xl border border-borderGray bg-white px-4 py-3 text-left text-sm font-semibold text-gray-700 transition duration-200 ease-out transform hover:-translate-y-[1px]" onclick="switchTab('historique')">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-scroll"></i><span> Journal complet</span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
