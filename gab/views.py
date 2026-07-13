@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from .models import GAB, Fournisseur
+from .services.diagnostic_service import DiagnosticService
+
 
 
 def liste_gab(request):
@@ -73,3 +75,8 @@ def gab_api_detail(request, terminal):
         "code_agence": gab.code_agence or "—",
         "emplacement": gab.emplacement or "—",
     })
+
+def diagnostic_api(request, gab_id):
+    diagnostic = DiagnosticService.get_diagnostic(gab_id)
+
+    return JsonResponse(diagnostic, safe=False)
