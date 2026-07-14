@@ -1,7 +1,7 @@
 import json
 
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from .models import GAB, Fournisseur
@@ -57,6 +57,10 @@ def liste_gab(request):
     query_params = request.GET.copy()
 
     query_params.pop("page", None)
+    query_params.pop("sel", None)
+
+    full_query = request.GET.copy()
+    full_query.pop("sel", None)
 
     context = {
         "page_obj": page_obj,
@@ -66,6 +70,7 @@ def liste_gab(request):
         ),
         "etats": GAB.ETAT_CHOICES,
         "query_string": query_params.urlencode(),
+        "current_query": full_query.urlencode(),
         "operational_count": operational_count,
         "critical_count": critical_count,
         "availability": availability,
@@ -115,13 +120,39 @@ def diagnostic_page(request, gab_id):
 
     diagnostic = DiagnosticService.get_diagnostic(gab_id)
 
+    if not diagnostic.get("gab"):
+        raise Http404("GAB non trouvé")
+
+    selected_component = DiagnosticService.get_default_component(
+        diagnostic
+    )
+    diagnostic["selected_component"] = selected_component
+
+    avail = diagnostic["availability"]
+
+    if avail.get("last_intervention"):
+        avail["last_intervention_display"] = avail["last_intervention"].strftime("%d/%m/%Y %H:%M")
+        avail["last_intervention_date"] = avail["last_intervention"].strftime("%d/%m/%Y")
+    else:
+        avail["last_intervention_display"] = None
+        avail["last_intervention_date"] = None
+
+    for item in diagnostic.get("history", []):
+        if item.get("date"):
+            item["date_display"] = item["date"].strftime("%d %b %y")
+            item["time_display"] = item["date"].strftime("%H:%M")
+        else:
+            item["date_display"] = None
+            item["time_display"] = None
+
     context = {
         "gab": diagnostic["gab"],
         "general_status": diagnostic["general_status"],
-        "availability": diagnostic["availability"],
+        "availability": avail,
         "components": diagnostic["components"],
         "history": diagnostic["history"],
-        "diagnostic_json": json.dumps(diagnostic,default=str),
+        "diagnostic_json": json.dumps(diagnostic, default=str),
+        "return_query": request.GET.get("from", ""),
     }
 
     return render(

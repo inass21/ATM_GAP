@@ -100,7 +100,7 @@
         <div class="flex items-center space-x-3">
             <span class="flex items-center text-green-600"><i class="fa-solid fa-circle-check mr-1.5 text-xs"></i> Synchronisation en temps réel</span>
             <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
-            <span class="text-xs font-semibold text-gray-400">Double-cliquez sur une ligne pour gérer le terminal</span>
+            <span class="text-xs font-semibold text-gray-400">Cliquez sur une ligne pour ouvrir le détail du terminal</span>
         </div>
         <div><span class="font-bold text-gray-700">{{ page_obj.paginator.count }}</span> GAB Monitorés</div>
     </div>
@@ -188,6 +188,17 @@
     let drawerTabs;
     let drawerSections;
     let gabRows;
+    let currentDrawerTerminal;
+    let diagnosticFrom = "";
+
+    function goToDiagnostic() {
+        if (!currentDrawerTerminal) return;
+        const url = (
+            "/gab/diagnostic/" + currentDrawerTerminal + "/?from=" +
+            encodeURIComponent(diagnosticFrom)
+        );
+        window.location.href = url;
+    }
 
     function initGabInteractions() {
         drawer = document.getElementById("gab-drawer");
@@ -200,10 +211,14 @@
             relances: document.getElementById("drawer-content-relances"),
             historique: document.getElementById("drawer-content-historique"),
         };
+        diagnosticFrom = "{{ current_query|escapejs }}";
+
         gabRows = Array.from(document.querySelectorAll("tr[data-gab-terminal]"));
         gabRows.forEach(row => {
             row.addEventListener("click", () => openDrawer(row.dataset.gabTerminal));
         });
+
+        highlightSelectedGab();
 
         const gabFilterSubmit = document.getElementById("gab-filter-submit");
         if (gabFilterSubmit) {
@@ -229,6 +244,21 @@
         }
     }
 
+    function highlightSelectedGab() {
+        const params = new URLSearchParams(window.location.search);
+        const selected = params.get("sel");
+        if (!selected) return;
+
+        const row = document.querySelector(
+            'tr[data-gab-terminal="' + selected + '"]'
+        );
+
+        if (row) {
+            row.classList.add("ring-2", "ring-bankBlue", "bg-bankBlue/5");
+            row.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
+    }
+
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", initGabInteractions);
     } else {
@@ -244,6 +274,7 @@
     window.switchTab = switchTab;
 
     function openDrawer(terminal) {
+        currentDrawerTerminal = terminal;
         drawer = drawer || document.getElementById("gab-drawer");
         backdrop = backdrop || document.getElementById("gab-drawer-backdrop");
         if (!drawer) {
