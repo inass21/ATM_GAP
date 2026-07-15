@@ -179,6 +179,8 @@ class AnalyticsService:
 
         for gab in gabs:
 
+            terminals = [gab.terminal]
+
             incidents = (
                 FilterService.get_incidents_queryset().filter(
                     id_gab__in=terminals

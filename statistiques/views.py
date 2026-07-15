@@ -1,6 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
+from .services.excel_export_service import (
+    ExcelExportService,
+)
 from .services.statistics_service import (
     StatisticsService,
 )
@@ -84,3 +87,18 @@ class StatisticsDashboardView(
         context["active_menu"] = "statistiques"
 
         return context
+
+
+class ExportStatisticsExcelView(
+    StatisticsDashboardView,
+):
+
+    login_url = "/login/"
+
+    def get(self, request, *args, **kwargs):
+
+        filters, _selected_filters = self._build_filters()
+
+        statistics = StatisticsService.get_dashboard_statistics(filters)
+
+        return ExcelExportService.export(statistics, filters)

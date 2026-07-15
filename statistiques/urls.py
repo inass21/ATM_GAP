@@ -1,6 +1,9 @@
 from django.urls import path
 
-from .views import StatisticsDashboardView
+from .views import (
+    ExportStatisticsExcelView,
+    StatisticsDashboardView,
+)
 
 app_name = "statistiques"
 
@@ -10,6 +13,12 @@ urlpatterns = [
         "",
         StatisticsDashboardView.as_view(),
         name="dashboard",
+    ),
+
+    path(
+        "export/excel/",
+        ExportStatisticsExcelView.as_view(),
+        name="export_excel",
     ),
 
 ]
