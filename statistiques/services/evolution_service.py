@@ -12,10 +12,10 @@ from .filter_service import FilterService
 class EvolutionService:
 
     @staticmethod
-    def get_evolution():
+    def get_evolution(filters=None):
 
         incidents_month = list(
-            FilterService.get_incidents_queryset()
+            FilterService.get_incidents_queryset(filters)
             .annotate(month=TruncMonth("date_arrete"))
             .values("month")
             .annotate(total=Count("id_incident"))
@@ -23,7 +23,7 @@ class EvolutionService:
         )
 
         interventions_month = list(
-            FilterService.get_interventions_queryset()
+            FilterService.get_interventions_queryset(filters)
             .annotate(month=TruncMonth("date_action"))
             .values("month")
             .annotate(total=Count("id_action_interv"))

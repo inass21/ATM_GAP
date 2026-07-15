@@ -9,17 +9,17 @@ from .supplier_service import SupplierService
 class DecisionService:
 
     @staticmethod
-    def get_recommendations():
+    def get_recommendations(filters=None):
 
         recommendations = []
 
-        kpis = KPIService.get_kpis()
+        kpis = KPIService.get_kpis(filters)
 
-        sla = SLAService.get_sla_metrics()
+        sla = SLAService.get_sla_metrics(filters)
 
-        health = HealthService.get_health_scores()
+        health = HealthService.get_health_scores(filters)
 
-        top_gabs = RankingService.get_top_gabs(5)
+        top_gabs = RankingService.get_top_gabs(5, filters)
 
         if kpis["availability"] < 95:
 

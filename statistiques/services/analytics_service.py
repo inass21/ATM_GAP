@@ -14,10 +14,10 @@ from gab.models_source import (
 from .filter_service import FilterService
 class AnalyticsService:
     @staticmethod
-    def get_performance():
+    def get_performance(filters=None):
 
         closed_incidents = (
-            FilterService.get_incidents_queryset()
+            FilterService.get_incidents_queryset(filters)
             .exclude(date_arrete__isnull=True)
             .exclude(date_remise__isnull=True)
             .filter(etat_incident=1)
@@ -51,7 +51,7 @@ class AnalyticsService:
         )
 
         intervention_time = (
-            FilterService.get_interventions_queryset()
+            FilterService.get_interventions_queryset(filters)
             .exclude(date_action__isnull=True)
             .exclude(date_prise_en_charge__isnull=True)
             .annotate(
@@ -65,7 +65,7 @@ class AnalyticsService:
             )["value"]
         )
 
-        total_incidents = FilterService.get_incidents_queryset().count()
+        total_incidents = FilterService.get_incidents_queryset(filters).count()
 
         closed_count = closed_incidents.count()
 
@@ -77,7 +77,7 @@ class AnalyticsService:
 
 
         average_escalation = (
-            FilterService.get_interventions_queryset().aggregate(
+            FilterService.get_interventions_queryset(filters).aggregate(
                 value=Avg("nbr_escalade")
             )["value"]
             or 0
@@ -85,7 +85,7 @@ class AnalyticsService:
 
 
         average_relance = (
-            FilterService.get_interventions_queryset().aggregate(
+            FilterService.get_interventions_queryset(filters).aggregate(
                 value=Avg("nbr_tentative")
             )["value"]
             or 0

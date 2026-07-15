@@ -13,9 +13,9 @@ from .filter_service import FilterService
 class SLAService:
 
     @staticmethod
-    def get_sla_metrics():
+    def get_sla_metrics(filters=None):
 
-        incidents = FilterService.get_incidents_queryset()
+        incidents = FilterService.get_incidents_queryset(filters)
 
         total_incidents = incidents.count()
 

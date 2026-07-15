@@ -12,17 +12,17 @@ from .filter_service import FilterService
 class DistributionService:
 
     @staticmethod
-    def get_distribution():
+    def get_distribution(filters=None):
 
         etat_distribution = list(
-            FilterService.get_gabs_queryset()
+            FilterService.get_gabs_queryset(filters)
             .values("etat")
             .annotate(total=Count("terminal"))
             .order_by("etat")
         )
 
         ville_distribution = list(
-            FilterService.get_gabs_queryset()
+            FilterService.get_gabs_queryset(filters)
             .exclude(ville__isnull=True)
             .exclude(ville="")
             .values("ville")
@@ -41,7 +41,7 @@ class DistributionService:
         )
 
         type_distribution = list(
-            FilterService.get_gabs_queryset()
+            FilterService.get_gabs_queryset(filters)
             .exclude(type_gab__isnull=True)
             .exclude(type_gab="")
             .values("type_gab")
@@ -50,7 +50,7 @@ class DistributionService:
         )
 
         agence_distribution = list(
-            FilterService.get_gabs_queryset()
+            FilterService.get_gabs_queryset(filters)
             .exclude(libelle_agence__isnull=True)
             .exclude(libelle_agence="")
             .values("libelle_agence")
@@ -59,21 +59,21 @@ class DistributionService:
         )[:10]
 
         incidents_filiale = list(
-            FilterService.get_incidents_queryset()
+            FilterService.get_incidents_queryset(filters)
             .values("cd_filiale")
             .annotate(total=Count("id_incident"))
             .order_by("-total")
         )
 
         incidents_fournisseur = list(
-            FilterService.get_incidents_queryset()
+            FilterService.get_incidents_queryset(filters)
             .values("cd_fournisseur")
             .annotate(total=Count("id_incident"))
             .order_by("-total")
         )
 
         interventions_responsable = list(
-            FilterService.get_interventions_queryset()
+            FilterService.get_interventions_queryset(filters)
             .values("responsable")
             .annotate(total=Count("id_action_interv"))
             .order_by("-total")

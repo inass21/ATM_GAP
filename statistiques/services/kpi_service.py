@@ -11,30 +11,30 @@ from .filter_service import FilterService
 class KPIService:
 
     @staticmethod
-    def get_kpis():
+    def get_kpis(filters=None):
 
-        total_gab =         FilterService.get_gabs_queryset().count()
+        total_gab =         FilterService.get_gabs_queryset(filters).count()
 
-        operational_gab =         FilterService.get_gabs_queryset().filter(
+        operational_gab =         FilterService.get_gabs_queryset(filters).filter(
             etat=GAB.ETAT_OPERATIONNEL
         ).count()
 
-        critical_gab =         FilterService.get_gabs_queryset().filter(
+        critical_gab =         FilterService.get_gabs_queryset(filters).filter(
             etat=GAB.ETAT_CRITIQUE
         ).count()
 
-        offline_gab =         FilterService.get_gabs_queryset().filter(
+        offline_gab =         FilterService.get_gabs_queryset(filters).filter(
             etat=GAB.ETAT_HORS_SERVICE
         ).count()
 
-        passive_gab =         FilterService.get_gabs_queryset().filter(
+        passive_gab =         FilterService.get_gabs_queryset(filters).filter(
             etat=GAB.ETAT_PASSIF
         ).count()
 
-        total_incidents = FilterService.get_incidents_queryset().count()
+        total_incidents = FilterService.get_incidents_queryset(filters).count()
 
         total_interventions = (
-            FilterService.get_interventions_queryset().count()
+            FilterService.get_interventions_queryset(filters).count()
         )
 
         total_filiales = Filiale.objects.count()

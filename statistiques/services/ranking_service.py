@@ -13,9 +13,9 @@ from .filter_service import FilterService
 class RankingService:
 
     @staticmethod
-    def get_top_gabs(limit=10):
+    def get_top_gabs(limit=10, filters=None):
 
-        scores = HealthService.get_health_scores()
+        scores = HealthService.get_health_scores(filters)
 
         return sorted(
             scores,
@@ -24,13 +24,13 @@ class RankingService:
         )[:limit]
 
     @staticmethod
-    def get_top_fournisseurs():
+    def get_top_fournisseurs(filters=None):
 
         ranking = []
 
         for fournisseur in Fournisseur.objects.all():
 
-            gabs = FilterService.get_gabs_queryset().filter(
+            gabs = FilterService.get_gabs_queryset(filters).filter(
                 fournisseur=fournisseur
             )
 
@@ -45,11 +45,11 @@ class RankingService:
                 etat=GAB.ETAT_OPERATIONNEL
             ).count()
 
-            incidents = FilterService.get_incidents_queryset().filter(
+            incidents = FilterService.get_incidents_queryset(filters).filter(
                 id_gab__in=terminals
             ).count()
 
-            interventions = FilterService.get_interventions_queryset().filter(
+            interventions = FilterService.get_interventions_queryset(filters).filter(
                 id_gab__in=terminals
             ).count()
 
@@ -82,10 +82,10 @@ class RankingService:
         )
 
     @staticmethod
-    def get_top_agences(limit=10):
+    def get_top_agences(limit=10, filters=None):
 
         agences = (
-            FilterService.get_gabs_queryset()
+            FilterService.get_gabs_queryset(filters)
             .values("libelle_agence")
             .annotate(
                 total=Count("terminal")
@@ -99,10 +99,10 @@ class RankingService:
         )[:limit]
 
     @staticmethod
-    def get_top_villes(limit=10):
+    def get_top_villes(limit=10, filters=None):
 
         villes = (
-            FilterService.get_gabs_queryset()
+            FilterService.get_gabs_queryset(filters)
             .values("ville")
             .annotate(
                 total=Count("terminal")

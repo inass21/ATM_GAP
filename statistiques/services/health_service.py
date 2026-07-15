@@ -12,20 +12,22 @@ from .filter_service import FilterService
 class HealthService:
 
     @staticmethod
-    def get_health_scores():
+    def get_health_scores(filters=None):
 
         health_scores = []
 
-        for gab in FilterService.get_gabs_queryset():
+        for gab in FilterService.get_gabs_queryset(filters):
+
+            per_gab_filters = {**(filters or {}), "atm": gab.terminal}
 
             score = 100
 
-            incidents = FilterService.get_incidents_queryset({"atm": gab.terminal}).count()
+            incidents = FilterService.get_incidents_queryset(per_gab_filters).count()
 
-            interventions = FilterService.get_interventions_queryset({"atm": gab.terminal}).count()
+            interventions = FilterService.get_interventions_queryset(per_gab_filters).count()
 
             average_escalation = (
-                FilterService.get_interventions_queryset({"atm": gab.terminal})
+                FilterService.get_interventions_queryset(per_gab_filters)
                 .aggregate(
                     value=Avg("nbr_escalade")
                 )["value"]
