@@ -162,8 +162,8 @@
                 </span>
 
                 <!-- Status dynamique -->
-                <span class="inline-flex items-center text-[10px] font-bold {% if comp.status == 'Opérationnel' or comp.status == 'Résolu' or comp.status == 'Traité' %}text-green-700{% elif comp.status == 'Inconnu' %}text-gray-500{% else %}text-red-700{% endif %}">
-                    <span class="w-1.5 h-1.5 rounded-full {% if comp.status == 'Opérationnel' or comp.status == 'Résolu' or comp.status == 'Traité' %}bg-green-500{% elif comp.status == 'Inconnu' %}bg-gray-400{% else %}bg-red-500 animate-pulse{% endif %} mr-1.5"></span>{{ comp.status|default:"—" }}
+                <span class="inline-flex items-center text-[10px] font-bold {% if comp.status == 'Opérationnel' or comp.status == 'Résolu' or comp.status == 'Traité' %}text-green-700{% else %}text-red-700{% endif %}">
+                    <span class="w-1.5 h-1.5 rounded-full {% if comp.status == 'Opérationnel' or comp.status == 'Résolu' or comp.status == 'Traité' %}bg-green-500{% else %}bg-red-500 animate-pulse{% endif %} mr-1.5"></span>{{ comp.status }}
                 </span>
             </div>
             {% endfor %}
@@ -286,10 +286,12 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{{ diagnostic_json|json_script:"diagnostic-data" }}
+
+
 <script>
-    // Variables pour l'intégration JS Externe
-    const diagnosticData = {{ diagnostic_json|safe }};
+    
+const diagnosticData = JSON.parse(
+    document.getElementById("diagnostic-data").textContent
+);
 </script>
-<script src="{% static 'gab/js/diagnostic.js' %}"></script>
-{% endblock %}

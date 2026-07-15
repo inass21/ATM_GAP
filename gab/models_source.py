@@ -283,3 +283,11 @@ class NewLibelleTypeContact(models.Model):
         managed = False
         db_table = 'new_libelle_type_contact'
 
+class NewCategorieIntervention(models.Model):
+    id_categorie = models.AutoField(primary_key=True)
+    libelle = models.CharField(max_length=100)
+    libelle_eng = models.CharField(max_length=50)
+
+    class Meta:
+        managed = False
+        db_table = "new_categorie_intervention"

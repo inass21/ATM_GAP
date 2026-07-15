@@ -22,4 +22,8 @@ urlpatterns = [
     path("tes/", include("tes.urls")),
     path("gab/", include("gab.urls")),
     path("", include("utilisateurs.urls")),
+    path(
+    "statistiques/",
+    include("statistiques.urls"),
+),
 ]
