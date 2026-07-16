@@ -94,15 +94,24 @@ class AvailabilityService:
         }
 
     @staticmethod
-    def _compute_availability(incidents):
+    def get_availability(incident_qs, gab_count=1):
+
+        # Single Source of Truth du calcul de disponibilite.
+        # `incident_qs` est un queryset de NewIncidentGab deja filtre
+        # (1 GAB pour get_summary, ou tous les GAB d'une ville pour la Carte).
+        # `gab_count` permet de rapporter la duree d'indisponibilite cumulee
+        # a la fenetre totale (fenetre * nombre de GAB supervisés).
 
         now = timezone.now()
         window_start = now - timedelta(days=AvailabilityService.WINDOW_DAYS)
         total_window = AvailabilityService.WINDOW_DAYS * 86400
 
+        if gab_count < 1:
+            gab_count = 1
+
         intervals = []
 
-        for incident in incidents.filter(date_arrete__isnull=False):
+        for incident in incident_qs.filter(date_arrete__isnull=False):
 
             arrete = incident.date_arrete
 
@@ -136,9 +145,17 @@ class AvailabilityService:
             now,
         )
 
-        availability = 100.0 * (total_window - downtime_total) / total_window
+        total_window_scope = total_window * gab_count
+        availability = 100.0 * (total_window_scope - downtime_total) / total_window_scope
 
         return round(max(0.0, min(100.0, availability)), 1)
+
+    @staticmethod
+    def _compute_availability(incidents):
+
+        # Conserve l'ancienne signature pour ne casser aucun appelant
+        # existant (comportement strictement identique : 1 GAB).
+        return AvailabilityService.get_availability(incidents, gab_count=1)
 
     @staticmethod
     def _merge_downtime(intervals, window_start, now):

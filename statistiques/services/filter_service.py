@@ -1,10 +1,14 @@
 import unicodedata
 
-from gab.models import GAB
+from django.db.models import CharField
+
+from gab.models import GAB, Fournisseur
 from gab.models_source import (
     NewIncidentGab,
     NewInteventionIncident,
+    NewCategorieIntervention,
 )
+from utilisateurs.models import Filiale
 
 
 _ALIASES = {
@@ -111,10 +115,71 @@ class FilterService:
 
         if _present(filters.get("atm")):
             queryset = queryset.filter(
-                terminal=filters["atm"]
+                id_gab=filters["atm"]
             )
 
         return queryset
+
+    # Options disponibles pour les filtres (Source Unique de Vérité)
+    @staticmethod
+    def get_filter_options():
+
+        regions = list(
+            NewIncidentGab.objects
+            .exclude(cd_region__isnull=True)
+            .exclude(cd_region="")
+            .values_list("cd_region", flat=True)
+            .distinct()
+            .order_by("cd_region")
+        )
+
+        filiale_codes = (
+            NewIncidentGab.objects
+            .exclude(cd_filiale__isnull=True)
+            .exclude(cd_filiale="")
+            .values_list("cd_filiale", flat=True)
+            .distinct()
+        )
+        filiales = []
+        for code in filiale_codes:
+            label = code
+            filiale = Filiale.objects.filter(pk=code).first()
+            if filiale:
+                label = filiale.nom_filiale
+            filiales.append({"code": code, "label": label})
+
+        villes = list(
+            GAB.objects
+            .exclude(ville__isnull=True)
+            .exclude(ville="")
+            .values_list("ville", flat=True)
+            .distinct()
+            .order_by("ville")
+        )
+
+        fournisseurs = [
+            {"id": str(f.id_fournisseur), "nom": f.nom_fournisseur}
+            for f in Fournisseur.objects.all().order_by("nom_fournisseur")
+        ]
+
+        etats = [
+            {"code": code, "label": label}
+            for code, label in GAB.ETAT_CHOICES
+        ]
+
+        categories = [
+            {"id": str(c.id_categorie), "label": c.libelle}
+            for c in NewCategorieIntervention.objects.all().order_by("libelle")
+        ]
+
+        return {
+            "regions": regions,
+            "filiales": filiales,
+            "villes": villes,
+            "fournisseurs": fournisseurs,
+            "etats": etats,
+            "categories": categories,
+        }
 
     # Incidents (NewIncidentGab)
     @staticmethod

@@ -37,11 +37,11 @@
         </a>
 
         <a href="{% url 'gab:liste_gab' %}"
-           class="flex items-center h-12 px-6 bg-gray-50 border-l-4 border-bankBlue text-bankNavy">
+           class="flex items-center h-12 px-6 {% if active_menu == 'gab' %}bg-gray-50 border-l-4 border-bankBlue text-bankNavy{% else %}text-gray-500 hover:bg-gray-50 hover:text-bankNavy border-l-4 border-transparent transition-all{% endif %}">
 
             <i class="fa-solid fa-server text-[17px] w-6 text-center"></i>
 
-            <span class="ml-4 text-sm font-semibold">
+            <span class="ml-4 text-sm {% if active_menu == 'gab' %}font-semibold{% else %}font-medium{% endif %}">
                 Parc GAB
             </span>
 
@@ -83,7 +83,14 @@
             <span class="ml-4 text-sm font-medium">
                 Relances
             </span>
+        </a>
 
+        <a href="{% url 'statistiques:dashboard' %}"
+           class="flex items-center h-12 px-6 {% if active_menu == 'statistiques' %}bg-gray-50 border-l-4 border-bankBlue text-bankNavy{% else %}text-gray-500 hover:bg-gray-50 hover:text-bankNavy border-l-4 border-transparent transition-all{% endif %}">
+            <i class="fa-solid fa-chart-simple text-[17px] w-6 text-center"></i>
+            <span class="ml-4 text-sm {% if active_menu == 'statistiques' %}font-semibold{% else %}font-medium{% endif %}">
+                Statistiques
+            </span>
         </a>
 
         <a href="#"

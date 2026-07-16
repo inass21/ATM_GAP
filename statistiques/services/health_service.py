@@ -1,4 +1,4 @@
-from django.db.models import Avg
+from django.db.models import Avg, Count
 
 from gab.models import GAB
 from gab.models_source import (
@@ -16,23 +16,37 @@ class HealthService:
 
         health_scores = []
 
-        for gab in FilterService.get_gabs_queryset(filters):
+        # P1 : agregations groupees (GROUP BY id_gab) au lieu de 3 requetes
+        # par GAB. Le resultat est strictement equivalent au calcul unitaire
+        # precedent (per_gab_filters = filters + atm=terminal), mais en 3
+        # requetes au total au lieu de 3 * nombre de GAB.
+        incidents_by_gab = dict(
+            FilterService.get_incidents_queryset(filters)
+            .values_list("id_gab")
+            .annotate(total=Count("id_incident"))
+        )
 
-            per_gab_filters = {**(filters or {}), "atm": gab.terminal}
+        interventions_by_gab = dict(
+            FilterService.get_interventions_queryset(filters)
+            .values_list("id_gab")
+            .annotate(total=Count("id_action_interv"))
+        )
+
+        escalation_by_gab = dict(
+            FilterService.get_interventions_queryset(filters)
+            .values_list("id_gab")
+            .annotate(value=Avg("nbr_escalade"))
+        )
+
+        for gab in FilterService.get_gabs_queryset(filters):
 
             score = 100
 
-            incidents = FilterService.get_incidents_queryset(per_gab_filters).count()
+            incidents = incidents_by_gab.get(gab.terminal, 0)
 
-            interventions = FilterService.get_interventions_queryset(per_gab_filters).count()
+            interventions = interventions_by_gab.get(gab.terminal, 0)
 
-            average_escalation = (
-                FilterService.get_interventions_queryset(per_gab_filters)
-                .aggregate(
-                    value=Avg("nbr_escalade")
-                )["value"]
-                or 0
-            )
+            average_escalation = escalation_by_gab.get(gab.terminal) or 0
 
             if gab.etat == GAB.ETAT_HORS_SERVICE:
                 score -= 30
@@ -91,3 +105,30 @@ class HealthService:
         )
 
         return health_scores
+
+    @staticmethod
+    def get_global_health(filters=None, scores=None):
+
+        if scores is None:
+            scores = HealthService.get_health_scores(filters)
+
+        if scores:
+            global_score = round(
+                sum(item["score"] for item in scores) / len(scores)
+            )
+        else:
+            global_score = 0
+
+        if global_score >= 90:
+            global_status = "Excellent"
+        elif global_score >= 75:
+            global_status = "Bon"
+        elif global_score >= 50:
+            global_status = "Moyen"
+        else:
+            global_status = "Critique"
+
+        return {
+            "score": global_score,
+            "status": global_status,
+        }

@@ -74,6 +74,7 @@ def liste_gab(request):
         "operational_count": operational_count,
         "critical_count": critical_count,
         "availability": availability,
+        "active_menu": "gab",
     }
 
     return render(
@@ -153,6 +154,7 @@ def diagnostic_page(request, gab_id):
         "history": diagnostic["history"],
         "diagnostic_json": json.dumps(diagnostic, default=str),
         "return_query": request.GET.get("from", ""),
+        "active_menu": "gab",
     }
 
     return render(

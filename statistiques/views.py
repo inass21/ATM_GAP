@@ -4,6 +4,9 @@ from django.views.generic import TemplateView
 from .services.excel_export_service import (
     ExcelExportService,
 )
+from .services.filter_service import (
+    FilterService,
+)
 from .services.statistics_service import (
     StatisticsService,
 )
@@ -82,6 +85,8 @@ class StatisticsDashboardView(
 
         context["selected_filters"] = selected_filters
 
+        context["filter_options"] = FilterService.get_filter_options()
+
         context["page_title"] = "Statistiques"
 
         context["active_menu"] = "statistiques"
@@ -101,4 +106,4 @@ class ExportStatisticsExcelView(
 
         statistics = StatisticsService.get_dashboard_statistics(filters)
 
-        return ExcelExportService.export(statistics, filters)
+        return ExcelExportService.export(statistics, filters, self.request.user)

@@ -4,6 +4,8 @@ from gab.models import GAB, Fournisseur
 from gab.models_source import (
     NewIncidentGab,
     NewInteventionIncident,
+    NewListFournisseur,
+    NewCategorieIntervention,
 )
 
 from .filter_service import FilterService
@@ -79,6 +81,28 @@ class DistributionService:
             .order_by("-total")
         )
 
+        fournisseur_map = {
+            f.id_fournisseur: f.nom_fournisseur
+            for f in NewListFournisseur.objects.all()
+        }
+
+        region_distribution = list(
+            FilterService.get_incidents_queryset(filters)
+            .exclude(cd_region__isnull=True)
+            .exclude(cd_region="")
+            .values("cd_region")
+            .annotate(total=Count("id_incident"))
+            .order_by("-total")
+        )
+
+        categorie_distribution = list(
+            FilterService.get_incidents_queryset(filters)
+            .exclude(id_categories_technique__isnull=True)
+            .values("id_categories_technique")
+            .annotate(total=Count("id_incident"))
+            .order_by("-total")
+        )
+
         return {
 
             "etat_distribution": etat_distribution,
@@ -91,9 +115,37 @@ class DistributionService:
 
             "agence_distribution": agence_distribution,
 
-            "incidents_filiale": incidents_filiale,
+            "incidents_categorie": [
+                {
+                    "categorie": (
+                        NewCategorieIntervention.objects
+                        .filter(pk=row["id_categories_technique"])
+                        .values_list("libelle", flat=True)
+                        .first()
+                        or f'Catégorie {row["id_categories_technique"]}'
+                    ),
+                    "total": row["total"],
+                }
+                for row in categorie_distribution
+            ],
 
-            "incidents_fournisseur": incidents_fournisseur,
+            "incidents_fournisseur": [
+                {
+                    "fournisseur": fournisseur_map.get(
+                        row["cd_fournisseur"],
+                        f"Fournisseur {row['cd_fournisseur']}",
+                    ),
+                    "total": row["total"],
+                }
+                for row in incidents_fournisseur
+            ],
+
+            "incidents_region": [
+                {"region": row["cd_region"], "total": row["total"]}
+                for row in region_distribution
+            ],
+
+            "incidents_filiale": incidents_filiale,
 
             "interventions_responsable": interventions_responsable,
 

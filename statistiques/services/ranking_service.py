@@ -13,14 +13,19 @@ from .filter_service import FilterService
 class RankingService:
 
     @staticmethod
-    def get_top_gabs(limit=10, filters=None):
+    def get_top_gabs(limit=10, filters=None, scores=None):
 
-        scores = HealthService.get_health_scores(filters)
+        if scores is None:
+            scores = HealthService.get_health_scores(filters)
 
+        # "Top GAB en panne" : les GAB les plus problématiques doivent
+        # remonter en premier. Le score de santé décroît quand l'état est
+        # dégradé et quand les incidents / interventions / escalades
+        # augmentent : le plus faible score = le GAB le plus critique.
+        # On trie donc par score CROISSANT (les pires d'abord).
         return sorted(
             scores,
             key=lambda x: x["score"],
-            reverse=True,
         )[:limit]
 
     @staticmethod

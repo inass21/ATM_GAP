@@ -134,6 +134,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 LOGIN_URL = "/login/"
 
+# Redirection temporaire post-connexion vers le Parc GAB (le Dashboard
+# principal n'est pas encore développé). À réviser une fois le Dashboard prêt.
+LOGIN_REDIRECT_URL = "/gab/"
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
