@@ -1,0 +1,52 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Interventions - ASIMS{% endblock %}
+
+{% block content %}
+
+<div class="asims-dash">
+
+    <header class="asims-header flex items-end justify-between mb-6">
+        <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                ASIMS / Interventions
+            </div>
+            <h1 class="asims-header__title">Interventions</h1>
+        </div>
+        <a href="{% url 'dashboard:index' %}" class="asims-btn">
+            <i class="fa-solid fa-arrow-left"></i> Retour au Dashboard
+        </a>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="asims-card asims-kpi">
+            <span class="asims-kpi__accent asims-kpi__accent--blue"></span>
+            <div class="asims-kpi__label">Interventions</div>
+            <div class="asims-kpi__value">{{ statistics.kpis.total_interventions }}</div>
+            <i class="fa-solid fa-wrench asims-kpi__icon"></i>
+        </div>
+        <div class="asims-card asims-kpi">
+            <span class="asims-kpi__accent asims-kpi__accent--green"></span>
+            <div class="asims-kpi__label">Disponibilité réseau</div>
+            <div class="asims-kpi__value">{{ statistics.kpis.availability }}<small>%</small></div>
+            <i class="fa-solid fa-gauge-high asims-kpi__icon"></i>
+        </div>
+    </div>
+
+    <section class="asims-card asims-card-hover p-5">
+        <h2 class="section-title mb-4">Actions recommandées</h2>
+        <div class="space-y-3">
+            {% for rec in statistics.recommendations %}
+            <div class="border border-gray-200 rounded p-3 bg-white">
+                <div class="text-xs font-semibold text-gray-800 mb-1">{{ rec.title }}</div>
+                <div class="text-[10px] text-gray-500">{{ rec.message }}</div>
+            </div>
+            {% empty %}
+            <div class="asims-empty">Aucune donnée disponible</div>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Rapports - ASIMS{% endblock %}
+
+{% block content %}
+
+<div class="asims-dash">
+
+    <header class="asims-header flex items-end justify-between mb-6">
+        <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                ASIMS / Rapports
+            </div>
+            <h1 class="asims-header__title">Rapports & Export</h1>
+        </div>
+        <a href="{% url 'statistiques:export_excel' %}" class="asims-btn asims-btn--primary">
+            <i class="fa-solid fa-download"></i> Exporter (Excel)
+        </a>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="asims-card asims-kpi">
+            <span class="asims-kpi__accent asims-kpi__accent--blue"></span>
+            <div class="asims-kpi__label">GAB supervisés</div>
+            <div class="asims-kpi__value">{{ statistics.kpis.total_gab }}</div>
+            <i class="fa-solid fa-server asims-kpi__icon"></i>
+        </div>
+        <div class="asims-card asims-kpi asims-kpi--danger">
+            <span class="asims-kpi__accent asims-kpi__accent--red"></span>
+            <div class="asims-kpi__label">Incidents ouverts</div>
+            <div class="asims-kpi__value">{{ statistics.kpis.total_incidents }}</div>
+            <i class="fa-solid fa-triangle-exclamation asims-kpi__icon"></i>
+        </div>
+        <div class="asims-card asims-kpi">
+            <span class="asims-kpi__accent asims-kpi__accent--green"></span>
+            <div class="asims-kpi__label">Disponibilité</div>
+            <div class="asims-kpi__value">{{ statistics.kpis.availability }}<small>%</small></div>
+            <i class="fa-solid fa-gauge-high asims-kpi__icon"></i>
+        </div>
+    </div>
+
+    <section class="asims-card asims-card-hover p-5">
+        <h2 class="section-title mb-4">Synthèse par ville</h2>
+        <div class="overflow-x-auto">
+            <table class="asims-table">
+                <thead>
+                    <tr>
+                        <th>VILLE</th>
+                        <th class="text-center">GAB</th>
+                        <th class="text-center">INCIDENTS</th>
+                        <th class="text-center">INTERVENTIONS</th>
+                        <th class="text-right">DISPONIBILITÉ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ville in statistics.rankings.villes %}
+                    <tr>
+                        <td class="font-bold text-gray-900">{{ ville.ville }}</td>
+                        <td class="text-center font-mono font-bold">{{ ville.total }}</td>
+                        <td class="text-center font-mono text-gray-900">—</td>
+                        <td class="text-center font-mono text-gray-500">—</td>
+                        <td class="text-right font-mono text-gray-900">{{ statistics.kpis.availability }}%</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="asims-empty">Aucune donnée disponible</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

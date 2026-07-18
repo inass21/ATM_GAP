@@ -1,0 +1,88 @@
+{% extends "base_dashboard.html" %}
+
+{% load static %}
+
+{% block title %}Carte de supervision - ASIMS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="asims-dash">
+
+    <header class="asims-header flex items-end justify-between mb-6">
+        <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                ASIMS / Supervision Nationale
+            </div>
+            <h1 class="asims-header__title">Carte de supervision du réseau</h1>
+        </div>
+        <a href="{% url 'dashboard:index' %}" class="asims-btn">
+            <i class="fa-solid fa-arrow-left"></i> Retour au Dashboard
+        </a>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <section class="asims-card asims-card-hover p-5 lg:col-span-2">
+            <h2 class="section-title mb-4">Vue nationale par ville</h2>
+            <div class="overflow-x-auto">
+                <table class="asims-table">
+                    <thead>
+                        <tr>
+                            <th>VILLE</th>
+                            <th class="text-center">GAB</th>
+                            <th class="text-center">OPÉRATIONNELS</th>
+                            <th class="text-center">HORS SERVICE</th>
+                            <th class="text-center">INCIDENTS OUVERTS</th>
+                            <th class="text-right">DISPONIBILITÉ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for region in regions %}
+                        <tr>
+                            <td class="font-bold text-gray-900">{{ region.ville }}</td>
+                            <td class="text-center font-mono">{{ region.total_gab }}</td>
+                            <td class="text-center font-mono text-green-600">{{ region.operational_gab }}</td>
+                            <td class="text-center font-mono text-red-600">{{ region.offline_gab }}</td>
+                            <td class="text-center font-mono">{{ region.open_incidents }}</td>
+                            <td class="text-right">
+                                <span class="font-mono font-bold {% if region.color == 'green' %}text-green-600{% elif region.color == 'orange' %}text-orange-500{% else %}text-red-600{% endif %}">
+                                    {{ region.availability }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="asims-empty">Aucune donnée disponible</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="asims-card asims-card-hover p-5">
+            <h2 class="section-title mb-4">Disponibilité par ville</h2>
+            <div class="space-y-4">
+                {% for region in regions %}
+                <div>
+                    <div class="flex justify-between text-[11px] font-bold text-gray-500 mb-1">
+                        <span class="uppercase">{{ region.ville }}</span>
+                        <span>{{ region.availability }}%</span>
+                    </div>
+                    <div class="asims-filiale__bar">
+                        <i class="{{ region.color }}" style="width:{{ region.availability }}%"></i>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="asims-empty">Aucune donnée disponible</div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base_dashboard.html" %}
+
+{% load static %}
+
+{% block title %}Déclaration d'incident - ASIMS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="asims-dash max-w-3xl">
+
+    <header class="asims-header flex items-end justify-between mb-6">
+        <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                ASIMS / Incidents
+            </div>
+            <h1 class="asims-header__title">Déclaration d'incident</h1>
+        </div>
+        <a href="{% url 'dashboard:index' %}" class="asims-btn">
+            <i class="fa-solid fa-arrow-left"></i> Retour au Dashboard
+        </a>
+    </header>
+
+    <section class="asims-card p-6">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="asims-state asims-state--crit">
+                <span class="asims-dot asims-dot--crit"></span> Nouveau
+            </span>
+            <p class="section-sub">
+                Formulaire de déclaration — module Incident (NewIncidentGab).
+            </p>
+        </div>
+
+        <div class="asims-empty">
+            <i class="fa-solid fa-clipboard-list text-3xl text-gray-300 mb-2"></i>
+            <p>Le formulaire de saisie est géré par le module <strong>Incidents</strong>.</p>
+            <a href="{% url 'incidents:liste' %}" class="asims-btn mt-4 inline-flex">
+                <i class="fa-solid fa-triangle-exclamation"></i> Accéder aux incidents
+            </a>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

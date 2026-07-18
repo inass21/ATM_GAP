@@ -21,6 +21,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("tes/", include("tes.urls")),
     path("gab/", include("gab.urls")),
+    path("dashboard/", include("dashboard.urls")),
+    path("incidents/", include("incidents.urls")),
+    path("interventions/", include("interventions.urls")),
+    path("rapports/", include("rapports.urls")),
     path("", include("utilisateurs.urls")),
     path(
     "statistiques/",

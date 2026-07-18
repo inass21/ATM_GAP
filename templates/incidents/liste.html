@@ -1,0 +1,80 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Incidents - ASIMS{% endblock %}
+
+{% block content %}
+
+<div class="asims-dash">
+
+    <header class="asims-header flex items-end justify-between mb-6">
+        <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                ASIMS / Incidents
+            </div>
+            <h1 class="asims-header__title">Incidents</h1>
+        </div>
+        <a href="{% url 'dashboard:declaration_incident' %}" class="asims-btn asims-btn--primary">
+            <i class="fa-solid fa-plus"></i> Déclarer un incident
+        </a>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="asims-card asims-kpi asims-kpi--danger">
+            <span class="asims-kpi__accent asims-kpi__accent--red"></span>
+            <div class="asims-kpi__label">Incidents ouverts</div>
+            <div class="asims-kpi__value">{{ statistics.kpis.total_incidents }}</div>
+            <i class="fa-solid fa-triangle-exclamation asims-kpi__icon"></i>
+        </div>
+        <div class="asims-card asims-kpi">
+            <span class="asims-kpi__accent asims-kpi__accent--blue"></span>
+            <div class="asims-kpi__label">GAB suivis</div>
+            <div class="asims-kpi__value">{{ statistics.kpis.total_gab }}</div>
+            <i class="fa-solid fa-server asims-kpi__icon"></i>
+        </div>
+        <div class="asims-card asims-kpi">
+            <span class="asims-kpi__accent asims-kpi__accent--green"></span>
+            <div class="asims-kpi__label">Disponibilité</div>
+            <div class="asims-kpi__value">{{ statistics.kpis.availability }}<small>%</small></div>
+            <i class="fa-solid fa-gauge-high asims-kpi__icon"></i>
+        </div>
+    </div>
+
+    <section class="asims-card asims-card-hover p-5">
+        <h2 class="section-title mb-4">Top GAB en panne</h2>
+        <div class="overflow-x-auto">
+            <table class="asims-table">
+                <thead>
+                    <tr>
+                        <th>IDENTIFIANT</th>
+                        <th>LOCALISATION</th>
+                        <th class="text-center">INCIDENTS</th>
+                        <th class="text-center">INTERVENTIONS</th>
+                        <th class="text-right">DÉTAILS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gab in statistics.rankings.gabs %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'gab:diagnostic' gab.terminal %}" class="asims-link">
+                                GAB-{{ gab.terminal }}
+                            </a>
+                        </td>
+                        <td class="text-gray-600">{{ gab.agence }}{% if gab.ville %} — {{ gab.ville }}{% endif %}</td>
+                        <td class="text-center font-mono {% if gab.incidents >= 10 %}text-red-600{% else %}text-gray-900{% endif %} font-bold">{{ gab.incidents }}</td>
+                        <td class="text-center font-mono text-gray-500">{{ gab.interventions }}</td>
+                        <td class="text-right">
+                            <a href="{% url 'gab:diagnostic' gab.terminal %}" class="asims-link">Consulter</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="asims-empty">Aucune donnée disponible</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

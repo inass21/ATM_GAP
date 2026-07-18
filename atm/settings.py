@@ -121,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Casablanca'
 
 USE_I18N = True
 
@@ -134,9 +134,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 LOGIN_URL = "/login/"
 
-# Redirection temporaire post-connexion vers le Parc GAB (le Dashboard
-# principal n'est pas encore développé). À réviser une fois le Dashboard prêt.
-LOGIN_REDIRECT_URL = "/gab/"
+# Redirection post-connexion vers le Centre de supervision (Dashboard).
+LOGIN_REDIRECT_URL = "/dashboard/"
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
@@ -145,3 +144,21 @@ STATICFILES_DIRS = [
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 AUTH_USER_MODEL = "utilisateurs.Utilisateur"
+
+# ---------------------------------------------------------------------------
+# Cache : accelere les pages lourdes (statistiques, rapports, dashboard).
+# locmem ne necessite aucune dependance externe (Redis n'est pas installe).
+# Les statistiques du parc sont recalculees au max toutes les 5 minutes,
+# ou immediatement quand une donnee source change (invalidation ciblee).
+# ---------------------------------------------------------------------------
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "asims_stats_cache",
+        "TIMEOUT": 300,
+        "OPTIONS": {"MAX_ENTRIES": 200},
+    }
+}
+
+# Duree de vie du cache des statistiques (secondes).
+STATISTICS_CACHE_TTL = config("STATISTICS_CACHE_TTL", default=300, cast=int)

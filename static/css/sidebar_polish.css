@@ -1,0 +1,120 @@
+/* =====================================================================
+   ASIMS - Sidebar & Topbar Polish (UI Finition "Enterprise")
+   Level: Azure / M365 / GitHub Enterprise.
+   CONSTRAINT: NO colored background on menu items (keep original
+   "no-fill" style). Only subtle effects: accent border, shift,
+   icon, transition.
+   ===================================================================== */
+
+:root {
+    --sb-bd: #E7ECF2;
+    --sb-bd-strong: #D7DEE7;
+    --sb-ink: #475569;
+    --sb-ink-strong: #0A2540;
+    --sb-accent: #639FAB;
+    --sb-hover: #F4F7FA;
+    --ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --t: 180ms;
+    --t-fast: 140ms;
+}
+
+/* ---------- SIDEBAR ---------- */
+aside { border-right-color: var(--sb-bd); }
+
+/* Logo separation softened */
+aside > div.h-20 { border-bottom-color: var(--sb-bd); }
+
+/* Items: no background, only accent + shift + transition */
+aside nav a,
+aside > div a {
+    position: relative;
+    border-radius: 0 10px 10px 0;
+    margin-right: 0.75rem;
+    border-left: 3px solid transparent;
+    background-color: transparent !important;
+    transition: color var(--t) var(--ease),
+                border-color var(--t) var(--ease),
+                padding-left var(--t) var(--ease);
+}
+
+/* Hover: light shift + accent border (NO background) */
+aside nav a:not([class*="bg-gray-50"]):hover,
+aside > div a:not([class*="bg-gray-50"]):hover {
+    padding-left: 1.7rem;
+    color: var(--sb-ink-strong);
+    border-left-color: var(--sb-accent);
+}
+
+/* Active item: ONLY blue accent (left border) + blue text. NO background. */
+aside nav a.bg-gray-50,
+aside nav a[class*="bg-gray-50"] {
+    color: var(--sb-accent);
+    border-left-color: var(--sb-accent);
+    border-left-width: 3px;
+    padding-left: 1.7rem;
+    background-color: transparent !important;
+}
+
+/* Icons: soft transition + slight scale */
+aside nav a i,
+aside > div a i {
+    transition: transform var(--t) var(--ease), color var(--t) var(--ease);
+}
+aside nav a:hover i,
+aside > div a:hover i,
+aside nav a[class*="bg-gray-50"] i { transform: scale(1.08); }
+
+/* Incident notification dot: soft pulse */
+aside .bg-red-500 {
+    animation: sb-dot 2.6s var(--ease) infinite;
+}
+@keyframes sb-dot {
+    0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+    70%  { box-shadow: 0 0 0 4px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+}
+
+/* Bottom "Parametres": same sober treatment */
+aside > div.border-t a:hover {
+    padding-left: 0.7rem;
+    border-left-color: transparent;
+}
+
+/* ---------- TOPBAR (navbar) ---------- */
+header.h-16 { border-bottom-color: var(--sb-bd); }
+
+/* Search: premium product style */
+header.h-16 input[type="text"] {
+    border-color: var(--sb-bd);
+    background: #F6F8FB;
+    box-shadow: 0 1px 1px rgba(15,23,42,0.02);
+    transition: border-color var(--t-fast) var(--ease),
+                box-shadow var(--t-fast) var(--ease),
+                background-color var(--t-fast) var(--ease);
+}
+header.h-16 input[type="text"]:focus {
+    background: #fff;
+    border-color: var(--sb-accent);
+    box-shadow: 0 0 0 3px rgba(99,159,171,0.18);
+}
+
+/* Notification button: refined hover */
+header.h-16 button.relative:hover { background: #F1F5F9; }
+header.h-16 button.relative { transition: background-color var(--t-fast) var(--ease); }
+
+/* User separator softer */
+header.h-16 .border-l { border-left-color: var(--sb-bd); }
+header.h-16 .fa-chevron-down { transition: color var(--t-fast) var(--ease); }
+header.h-16 button:hover .fa-chevron-down { color: var(--sb-ink-strong); }
+
+/* Avatar: soft shadow + light ring */
+header.h-16 .rounded-full {
+    box-shadow: 0 1px 2px rgba(15,23,42,0.12), inset 0 0 0 1px rgba(255,255,255,0.12);
+}
+
+/* ---------- MOTION REDUCED ---------- */
+@media (prefers-reduced-motion: reduce) {
+    aside * { transition: none !important; animation: none !important; }
+    aside nav a:not([class*="bg-gray-50"]):hover,
+    aside > div a:hover { padding-left: 1.7rem; }
+}

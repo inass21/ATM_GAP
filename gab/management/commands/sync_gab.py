@@ -22,6 +22,14 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Synchronisation terminée."))
 
+        # Les donnees source des statistiques viennent d'ici : on vide le
+        # cache pour forcer un recalcul a la prochaine requete.
+        from statistiques.services.statistics_service import (
+            invalidate_statistics_cache,
+        )
+        invalidate_statistics_cache()
+        self.stdout.write(self.style.SUCCESS("✔ Cache statistiques invalidé"))
+
     # FILIALES
 
     def sync_filiales(self):

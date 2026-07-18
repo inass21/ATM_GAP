@@ -115,6 +115,9 @@ class AvailabilityService:
 
             arrete = incident.date_arrete
 
+            if arrete is None:
+                continue
+
             if arrete > now:
                 continue
 

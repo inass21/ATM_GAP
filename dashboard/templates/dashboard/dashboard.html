@@ -1,0 +1,280 @@
+{% extends "base_dashboard.html" %}
+
+{% load static %}
+
+{% block title %}Dashboard de Supervision - ASIMS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=3">
+{% endblock %}
+
+{% block content %}
+
+    <!-- PAGE HEADER -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-end shrink-0">
+
+        <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">ASIMS / Dashboard de Supervision</div>
+            <h1 class="text-2xl font-bold text-gray-900">Vue globale du réseau GAB</h1>
+        </div>
+
+        <div class="flex flex-col items-center pb-1">
+            <div class="text-sm font-bold text-gray-800 flex items-center gap-2 mb-1">
+                <span class="asims-state {% if dashboard.network_state == 'CRITIQUE' %}asims-state--danger{% elif dashboard.network_state == 'DEGRADE' %}asims-state--warning{% else %}asims-state--ok{% endif %}"><span class="asims-dot"></span> {% if dashboard.network_state == 'CRITIQUE' %}Réseau en alerte{% elif dashboard.network_state == 'DEGRADE' %}Réseau dégradé{% else %}Réseau opérationnel{% endif %}</span>
+            </div>
+            <div class="text-[11px] text-gray-400 font-medium">
+                Dernière synchro :
+                <span class="text-gray-600 font-bold">
+                    {% if dashboard.last_sync %}{{ dashboard.last_sync|date:"H:i:s" }}{% else %}—{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a href="{% url 'dashboard:declaration_incident' %}" class="btn-outline">+ Incident</a>
+            <a href="{% url 'interventions:liste' %}" class="btn-outline">+ Intervention</a>
+            <a href="{% url 'rapports:liste' %}" class="btn-outline">Export PDF</a>
+        </div>
+
+    </header>
+
+    <!-- MAIN DASHBOARD SCROLL AREA -->
+    <main class="flex-1 overflow-y-auto p-6 bg-[#F8F9FA]">
+
+        <!-- ROW 1: Main Bar Chart & Donut -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+            <!-- Big Bar Chart Area -->
+            <div class="card lg:col-span-2 p-5 flex flex-col">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="section-title">Activité du parc GAB</h2>
+                        <p class="sub-text mt-1">Évolution des incidents (12 derniers mois, jusqu'au {% if dashboard.last_incident_date %}{{ dashboard.last_incident_date|date:"d/m/Y" }}{% else %}—{% endif %})</p>
+                    </div>
+                    <div class="flex border border-gray-200 rounded text-[10px] font-semibold text-gray-500 overflow-hidden">
+                        <button class="px-3 py-1 bg-gray-100 text-gray-800 border-r border-gray-200">WEEK</button>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex gap-6">
+                    <!-- Left: Bar Chart (Chart.js, style d.html) -->
+                    <div class="w-2/3 border-r border-gray-100 pr-6 flex flex-col justify-end gap-1 h-56 pb-2">
+                        <div class="flex-1 w-full">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Right: Progress Stats -->
+                    <div class="w-1/3 flex flex-col justify-between py-2">
+                        {% with dist=dashboard.distribution total=dashboard.total_gab %}
+                        {% if total %}
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1">
+                                <span class="uppercase">Opérationnels</span>
+                                <span>{% widthratio dist.operational total 100 %}% du parc</span>
+                            </div>
+                            <div class="flex items-end gap-2 mb-2">
+                                <span class="text-2xl font-bold text-gray-800 leading-none">{{ dist.operational }}</span>
+                                <span class="text-[11px] text-gray-400">/ {{ total }}</span>
+                            </div>
+                            <div class="asims-bar"><i class="cyan" style="width:{% widthratio dist.operational total 100 %}%"></i></div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1">
+                                <span class="uppercase">En Maintenance</span>
+                                <span>{% widthratio dist.maintenance total 100 %}% du parc</span>
+                            </div>
+                            <div class="flex items-end gap-2 mb-2">
+                                <span class="text-2xl font-bold text-gray-800 leading-none">{{ dist.maintenance }}</span>
+                                <span class="text-[11px] text-gray-400">/ {{ total }}</span>
+                            </div>
+                            <div class="asims-bar"><i class="orange" style="width:{% widthratio dist.maintenance total 100 %}%"></i></div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1">
+                                <span class="uppercase">Hors Service</span>
+                                <span>{% widthratio dist.offline total 100 %}% du parc</span>
+                            </div>
+                            <div class="flex items-end gap-2 mb-2">
+                                <span class="text-2xl font-bold text-gray-800 leading-none">{{ dist.offline }}</span>
+                                <span class="text-[11px] text-gray-400">/ {{ total }}</span>
+                            </div>
+                            <div class="asims-bar"><i class="blue" style="width:{% widthratio dist.offline total 100 %}%"></i></div>
+                        </div>
+                        {% else %}
+                        <div class="asims-empty">Aucune donnée disponible</div>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donut Chart -->
+            <div class="card p-5">
+                <h2 class="section-title mb-6">Répartition des états GAB</h2>
+
+                <!-- Donut (Chart.js, couleurs d.html) -->
+                <div class="flex justify-center mb-8 mt-4">
+                    <div class="relative w-40 h-40">
+                        <canvas id="etatGabChart"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span class="text-2xl font-bold text-gray-800">{{ dashboard.global_health.score }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend Grid -->
+                <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-[11px]">
+                    <div>
+                        <div class="text-gray-400 font-bold uppercase mb-1">Opérationnel</div>
+                        <div class="flex items-center gap-2 font-bold text-sm text-gray-800"><span class="w-2 h-2 rounded-full c-cyan"></span> {{ dashboard.distribution.operational }} </div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 font-bold uppercase mb-1">Maintenance</div>
+                        <div class="flex items-center gap-2 font-bold text-sm text-gray-800"><span class="w-2 h-2 rounded-full c-orange"></span> {{ dashboard.distribution.maintenance }} </div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 font-bold uppercase mb-1">Hors Service</div>
+                        <div class="flex items-center gap-2 font-bold text-sm text-gray-800"><span class="w-2 h-2 rounded-full c-pink"></span> {{ dashboard.distribution.offline }} </div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 font-bold uppercase mb-1">Critique</div>
+                        <div class="flex items-center gap-2 font-bold text-sm text-gray-800"><span class="w-2 h-2 rounded-full c-blue"></span> {{ dashboard.distribution.critical }} </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: Three Mini Sparkline Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+            <!-- Card 1 -->
+            <div class="card p-5 asims-kpi asims-kpi--danger">
+                <h2 class="section-title mb-1">Incidents Ouverts</h2>
+                <p class="sub-text mb-4">Évolution des pannes physiques signalées.</p>
+                <div class="flex items-end gap-6 mb-4">
+                    <div>
+                        <div class="flex items-center gap-2 text-xl font-bold text-gray-800">{{ dashboard.open_incidents }}</div>
+                        <div class="text-[10px] text-gray-400 font-bold uppercase mt-1">+{{ dashboard.incidents_today }} DERNIER JOUR</div>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-1">GAB Critiques : {{ dashboard.distribution.critical }}</div>
+                        <div class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-1">GAB Hors service : {{ dashboard.distribution.offline }}</div>
+                        <div class="flex items-center gap-2 text-sm font-bold text-gray-800">GAB En maintenance : {{ dashboard.distribution.maintenance }}</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-triangle-exclamation asims-kpi__icon"></i>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card p-5">
+                <h2 class="section-title mb-4">Interventions en cours</h2>
+                <div class="flex justify-between text-[11px] font-bold text-gray-400 mb-2">
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full hs-blue"></span> EN COURS</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full c-cyan"></span> TOTAL</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold text-gray-800 mb-6">
+                    <span>{{ dashboard.interventions_en_cours }}</span>
+                    <a href="{% url 'interventions:liste' %}" class="asims-link text-sm">{{ dashboard.kpis.total_interventions }}</a>
+                </div>
+                <div class="text-2xl font-bold text-gray-800 text-center mb-2">{{ dashboard.interventions_en_cours }} EN COURS</div>
+                <div class="h-6 border-b border-gray-100 flex items-center justify-center text-[10px] text-gray-300">
+                    [ Mini Chart Graph ]
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card p-5 flex flex-col justify-center items-center text-center">
+                <h2 class="section-title w-full text-left mb-4">Disponibilité réseau</h2>
+                <div class="text-4xl font-bold text-gray-800 mb-1">{{ dashboard.kpis.availability }}%</div>
+                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-4">OBJECTIF: {{ dashboard.network_objective }}%</div>
+                <p class="sub-text mb-4 px-4 font-bold text-sm {% if dashboard.network_state == 'CRITIQUE' %}text-red-500{% elif dashboard.network_state == 'DEGRADE' %}text-orange-500{% else %}text-emerald-500{% endif %}">{% if dashboard.network_status == 'STABLE' %}🟢 STABLE{% elif dashboard.network_status == 'DEGRADE' %}🟠 DÉGRADÉ{% else %}🔴 CRITIQUE{% endif %}</p>
+            </div>
+        </div>
+
+        <!-- ROW 3: Data Tables -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Table 1 -->
+            <div class="card p-5">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-title">GAB les plus critiques</h2>
+                    <a href="{% url 'gab:liste_gab' %}" class="asims-link">Parc complet</a>
+                </div>
+
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-[10px] text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                            <th class="pb-2 font-bold w-1/4">TERMINAL</th>
+                            <th class="pb-2 font-bold w-1/4">VILLE</th>
+                            <th class="pb-2 font-bold w-1/4">ÉTAT</th>
+                            <th class="pb-2 font-bold text-right w-1/4">SCORE</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[12px] text-gray-700 font-medium">
+                        {% for gab in dashboard.critical_gabs %}
+                        <tr>
+                            <td class="py-3">
+                                <a href="{% url 'gab:diagnostic' gab.terminal %}" class="asims-link font-bold">{{ gab.terminal }}</a>
+                            </td>
+                            <td class="py-3">{{ gab.ville|default:"—" }}</td>
+                            <td class="py-3">
+                                <span class="asims-badge {% if gab.status == 'Critique' %}asims-badge--p1{% else %}asims-badge--p2{% endif %}">{{ gab.status }}</span>
+                            </td>
+                            <td class="py-3 text-right font-mono font-bold text-gray-800">{{ gab.score }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="asims-empty">Aucun GAB critique</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table 2 -->
+            <div class="card p-5">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-title">Dernières activités</h2>
+                    <a href="{% url 'incidents:liste' %}" class="asims-link">Tous les incidents</a>
+                </div>
+
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-[10px] text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                            <th class="pb-2 font-bold">GAB</th>
+                            <th class="pb-2 font-bold">VILLE</th>
+                            <th class="pb-2 font-bold text-right">TICKET</th>
+                            <th class="pb-2 font-bold text-right">ARRÊT</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[12px] text-gray-700 font-medium">
+                        {% for item in dashboard.live_feed %}
+                        <tr>
+                            <td class="py-3">
+                                <a href="{% url 'gab:diagnostic' item.terminal %}" class="asims-link font-bold">GAB-{{ item.terminal }}</a>
+                            </td>
+                            <td class="py-3">{{ item.ville|default:"—" }}</td>
+                            <td class="py-3 text-right font-mono">{{ item.num_tiket|default:"—" }}</td>
+                            <td class="py-3 text-right text-gray-500 font-mono">
+                                {% if item.date_arrete %}{{ item.date_arrete|date:"H:i" }}{% else %}—{% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="asims-empty">Aucun incident en cours</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{ dashboard.evolution|json_script:"evo-data" }}
+{{ dashboard.distribution|json_script:"dist-data" }}
+<script src="{% static 'dashboard/js/dashboard.js' %}?v=3"></script>
+{% endblock %}
