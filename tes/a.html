@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport Mensuel ASIMS</title>
+    <style>
+        /* --- CONFIGURATION WEASYPRINT (PDF A4) --- */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Page " counter(page) " sur " counter(pages);
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+            }
+        }
+
+        /* --- STYLES GLOBAUX --- */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #334155;
+            background-color: #ffffff;
+            font-size: 10pt;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        h1, h2, h3, h4 { color: #1e3a8a; margin-top: 0; }
+
+        /* --- HEADER --- */
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1e3a8a;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header-title { font-size: 18pt; font-weight: bold; text-transform: uppercase; color: #1e3a8a; }
+        .header-meta { text-align: right; font-size: 9pt; color: #64748b; }
+        .header-meta strong { color: #1e3a8a; }
+
+        /* --- SECTIONS --- */
+        .section-title {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+            margin-bottom: 15px;
+            margin-top: 25px;
+            color: #1e3a8a;
+        }
+
+        /* --- WIDGETS & KPIS --- */
+        .grid-kpi {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .kpi-box {
+            flex: 1;
+            min-width: 100px;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            text-align: center;
+            background-color: #f8fafc;
+        }
+        .kpi-label { font-size: 8pt; text-transform: uppercase; color: #64748b; font-weight: bold; margin-bottom: 5px; }
+        .kpi-value { font-size: 16pt; font-weight: bold; color: #1e3a8a; }
+        .kpi-value.danger { color: #ef4444; }
+        .kpi-value.success { color: #10b981; }
+
+        /* --- GRAPHIQUES (MATPLOTLIB PLACEHOLDERS) --- */
+        .chart-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+        .chart-placeholder {
+            width: 100%;
+            height: 250px;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 9pt;
+            border: 1px dashed #cbd5e1;
+        }
+        /* Pour les vraies images générées par Matplotlib */
+        .chart-container img { width: 100%; height: auto; display: block; }
+
+        /* --- TABLES --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 9pt;
+        }
+        th {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            text-align: left;
+            padding: 8px;
+            font-size: 8pt;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+        tr:nth-child(even) td { background-color: #f8fafc; }
+        .badge-danger { background-color: #fee2e2; color: #ef4444; padding: 2px 6px; font-size: 7pt; font-weight: bold; border-radius: 2px;}
+        .badge-warning { background-color: #fef3c7; color: #d97706; padding: 2px 6px; font-size: 7pt; font-weight: bold; border-radius: 2px;}
+
+        /* --- TEXTE EXECUTIF --- */
+        .summary-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 9pt;
+        }
+        .auto-analysis {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         PAGE 1 : EXECUTIVE SUMMARY & KPIS
+         ========================================== -->
+    <div class="report-header">
+        <div>
+            <!-- Remplacez par le logo HPS/ASIMS en base64 ou chemin absolu pour WeasyPrint -->
+            <div style="font-size: 20pt; font-weight: 900; color: #1e3a8a; letter-spacing: -1px;">HPS <span style="font-weight: 300;">| ASIMS</span></div>
+        </div>
+        <div class="header-meta">
+            <div class="header-title">Executive Report</div>
+            Type: <strong>Rapport Mensuel</strong><br>
+            Période: <strong>Juillet 2026</strong><br>
+            Généré le: <strong>16/07/2026</strong>
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <strong>Résumé Exécutif :</strong> Le réseau GAB a maintenu une disponibilité globale de 98.5% durant ce mois. Nous constatons une légère hausse des incidents de bourrage (+2%) par rapport au mois précédent, principalement concentrés sur la région Casablanca-Settat. Les SLAs d'intervention ont été respectés à 96%.
+    </div>
+
+    <div class="section-title">Indicateurs de Performance (KPIs)</div>
+    <div class="grid-kpi">
+        <div class="kpi-box">
+            <div class="kpi-label">Total Parc GAB</div>
+            <div class="kpi-value">153</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Opérationnels</div>
+            <div class="kpi-value success">145</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Hors Service</div>
+            <div class="kpi-value danger">8</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Incidents Ouverts</div>
+            <div class="kpi-value">24</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">MTTR Moyen</div>
+            <div class="kpi-value">2h 15m</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Disponibilité</div>
+            <div class="kpi-value success">98.5%</div>
+        </div>
+    </div>
+
+    <div class="chart-row">
+        <div class="chart-container">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Évolution de la Disponibilité (%)</div>
+            <!-- Intégration Matplotlib SVG/PNG -->
+            <div class="chart-placeholder">[ Matplotlib : Line Chart Disponibilité ]</div>
+        </div>
+        <div class="chart-container">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Répartition des États</div>
+            <!-- Intégration Matplotlib SVG/PNG -->
+            <div class="chart-placeholder">[ Matplotlib : Donut Chart États ]</div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PAGE 2 : ANALYSE DES INCIDENTS (Saut de page)
+         ========================================== -->
+    <div class="page-break"></div>
+    
+    <div class="report-header">
+        <div style="font-size: 14pt; font-weight: bold; color: #1e3a8a;">ASIMS</div>
+        <div class="header-meta">Détails des Incidents | <strong>Juillet 2026</strong></div>
+    </div>
+
+    <div class="section-title">Analyse des Incidents & Interventions</div>
+    
+    <div class="chart-row">
+        <div class="chart-container" style="flex: 2;">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Évolution des Incidents par Priorité</div>
+            <div class="chart-placeholder" style="height: 300px;">[ Matplotlib : Stacked Bar Chart Incidents ]</div>
+        </div>
+    </div>
+
+    <div class="chart-row">
+        <div class="chart-container">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Répartition par Cause Racine</div>
+            <div class="chart-placeholder" style="height: 250px;">[ Matplotlib : Horizontal Bar Chart Causes ]</div>
+        </div>
+        <div class="chart-container">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Volume d'Interventions</div>
+            <div class="chart-placeholder" style="height: 250px;">[ Matplotlib : Area Chart Interventions ]</div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PAGE 3 : DONNÉES DÉTAILLÉES (TABLEAUX)
+         ========================================== -->
+    <div class="page-break"></div>
+
+    <div class="report-header">
+        <div style="font-size: 14pt; font-weight: bold; color: #1e3a8a;">ASIMS</div>
+        <div class="header-meta">Données Détaillées | <strong>Juillet 2026</strong></div>
+    </div>
+
+    <div class="section-title">Top 10 GAB Critiques (Disponibilité < 90%)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID Terminal</th>
+                <th>Agence / Localisation</th>
+                <th>Région</th>
+                <th>Total Incidents</th>
+                <th>Disponibilité</th>
+                <th>Statut Actuel</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>GAB-2049</strong></td>
+                <td>Agence Casa Centre</td>
+                <td>Casablanca-Settat</td>
+                <td>12</td>
+                <td><strong style="color: #ef4444;">82.4%</strong></td>
+                <td><span class="badge-danger">HORS SERVICE</span></td>
+            </tr>
+            <tr>
+                <td><strong>GAB-1102</strong></td>
+                <td>Agence Rabat Agdal</td>
+                <td>Rabat-Salé-Kénitra</td>
+                <td>8</td>
+                <td><strong style="color: #d97706;">88.1%</strong></td>
+                <td><span class="badge-warning">MAINTENANCE</span></td>
+            </tr>
+            <tr>
+                <td><strong>GAB-3011</strong></td>
+                <td>Agence Fès Médina</td>
+                <td>Fès-Meknès</td>
+                <td>7</td>
+                <td><strong style="color: #d97706;">89.5%</strong></td>
+                <td>Opérationnel</td>
+            </tr>
+            <!-- Boucle Django For ici -->
+        </tbody>
+    </table>
+
+    <div class="section-title">Agences les plus impactées</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Agence</th>
+                <th>Nombre de GAB</th>
+                <th>Incidents Majeurs</th>
+                <th>MTTR Agence</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Agence Casa Centre</td>
+                <td>4</td>
+                <td>15</td>
+                <td>3h 45m</td>
+            </tr>
+            <tr>
+                <td>Agence Rabat Agdal</td>
+                <td>3</td>
+                <td>9</td>
+                <td>2h 10m</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==========================================
+         PAGE 4 : CONCLUSION & PIED DE PAGE
+         ========================================== -->
+    <div class="page-break"></div>
+
+    <div class="report-header">
+        <div style="font-size: 14pt; font-weight: bold; color: #1e3a8a;">ASIMS</div>
+        <div class="header-meta">Analyses & Recommandations | <strong>Juillet 2026</strong></div>
+    </div>
+
+    <div class="section-title">Analyse Automatique du Système</div>
+    <div class="auto-analysis">
+        <h4 style="margin-bottom: 10px;">Observations Générées :</h4>
+        <ul style="margin-top: 0; padding-left: 20px; font-size: 9pt;">
+            <li>Le terminal <strong>GAB-2049</strong> présente un taux d'échec matériel critique (Module Distributeur). Une maintenance préventive de niveau 2 est requise.</li>
+            <li>Le temps moyen de résolution (MTTR) dans la région <em>Casablanca-Settat</em> est supérieur de 45 minutes à la moyenne nationale.</li>
+            <li>Le pic d'incidents a été enregistré durant la semaine du 10 au 16 Juillet, corrélé avec une mise à jour logicielle réseau.</li>
+        </ul>
+    </div>
+
+    <div class="section-title">Conclusion & Recommandations Management</div>
+    <p style="font-size: 9.5pt; text-align: justify;">
+        Les performances globales du parc GAB restent alignées avec les objectifs de disponibilité fixés (>98%). Néanmoins, une attention particulière doit être portée au remplacement des cassettes défectueuses sur les modèles NCR de la région centre, qui constituent actuellement 40% des causes d'arrêt prolongé. Il est recommandé de planifier une tournée d'inspection matérielle sur le Top 10 des GAB critiques identifiés dans ce rapport avant la fin du prochain trimestre.
+    </p>
+
+    <!-- Pied de page du document final -->
+    <div style="position: absolute; bottom: 2cm; left: 1.5cm; right: 1.5cm; border-top: 1px solid #cbd5e1; padding-top: 10px; font-size: 8pt; color: #94a3b8; text-align: center;">
+        Ce rapport a été généré automatiquement par la plateforme ASIMS (Automated Supervision & Incident Management System).<br>
+        Pour toute question, veuillez contacter le centre de supervision central. © 2026 HPS.
+    </div>
+
+</body>
+</html>

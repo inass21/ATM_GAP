@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'dashboard',
     'gab',
     'incidents',
-    'relances',
     'interventions',
     'bibliotheque',
     'statistiques',
@@ -81,8 +80,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'atm.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
     "default": {
@@ -97,8 +94,7 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -116,8 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -128,13 +122,10 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
 STATIC_URL = 'static/'
 LOGIN_URL = "/login/"
 
-# Redirection post-connexion vers le Centre de supervision (Dashboard).
+
 LOGIN_REDIRECT_URL = "/dashboard/"
 
 STATICFILES_DIRS = [
@@ -145,12 +136,6 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 AUTH_USER_MODEL = "utilisateurs.Utilisateur"
 
-# ---------------------------------------------------------------------------
-# Cache : accelere les pages lourdes (statistiques, rapports, dashboard).
-# locmem ne necessite aucune dependance externe (Redis n'est pas installe).
-# Les statistiques du parc sont recalculees au max toutes les 5 minutes,
-# ou immediatement quand une donnee source change (invalidation ciblee).
-# ---------------------------------------------------------------------------
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",

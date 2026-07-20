@@ -89,7 +89,7 @@ class RankingService:
     @staticmethod
     def get_top_agences(limit=10, filters=None):
 
-        agences = (
+        agences = list(
             FilterService.get_gabs_queryset(filters)
             .values("libelle_agence")
             .annotate(
@@ -97,9 +97,34 @@ class RankingService:
             )
         )
 
+        incidents_qs = (
+            FilterService.get_incidents_queryset(filters)
+            .values("nom_agence")
+            .annotate(
+                incidents_majeurs=Count("id_incident")
+            )
+        )
+        incidents_par_agence = {
+            row["nom_agence"]: row["incidents_majeurs"]
+            for row in incidents_qs
+            if row["nom_agence"]
+        }
+
+        result = []
+        for row in agences:
+            nom = row["libelle_agence"] or "Inconnue"
+            result.append({
+                "libelle_agence": nom,
+                "nom": nom,
+                "total": row["total"],
+                "nb_gab": row["total"],
+                "incidents_majeurs": incidents_par_agence.get(nom, 0),
+                "mttr": "-",
+            })
+
         return sorted(
-            agences,
-            key=lambda x: x["total"],
+            result,
+            key=lambda x: x["incidents_majeurs"],
             reverse=True,
         )[:limit]
 

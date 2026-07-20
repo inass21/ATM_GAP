@@ -10,4 +10,9 @@ urlpatterns = [
         views.RapportsListView.as_view(),
         name="liste",
     ),
+    path(
+        "test-pdf/",
+        views.TestPDFView.as_view(),
+        name="test_pdf",
+    ),
 ]

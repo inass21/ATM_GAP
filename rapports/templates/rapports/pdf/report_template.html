@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report_info.titre|default:"Rapport ASIMS" }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Page " counter(page) " sur " counter(pages);
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+            }
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #334155;
+            background-color: #ffffff;
+            font-size: 10pt;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        h1, h2, h3, h4 { color: #1e3a8a; margin-top: 0; }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1e3a8a;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header-title { font-size: 18pt; font-weight: bold; text-transform: uppercase; color: #1e3a8a; }
+        .header-meta { text-align: right; font-size: 9pt; color: #64748b; }
+        .header-meta strong { color: #1e3a8a; }
+
+        .section-title {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+            margin-bottom: 15px;
+            margin-top: 25px;
+            color: #1e3a8a;
+        }
+
+        .grid-kpi {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .kpi-box {
+            flex: 1;
+            min-width: 100px;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            text-align: center;
+            background-color: #f8fafc;
+        }
+        .kpi-label { font-size: 8pt; text-transform: uppercase; color: #64748b; font-weight: bold; margin-bottom: 5px; }
+        .kpi-value { font-size: 16pt; font-weight: bold; color: #1e3a8a; }
+        .kpi-value.danger { color: #ef4444; }
+        .kpi-value.success { color: #10b981; }
+
+        .chart-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+        .chart-placeholder {
+            width: 100%;
+            height: 250px;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 9pt;
+            border: 1px dashed #cbd5e1;
+        }
+        .chart-container img { width: 100%; height: auto; display: block; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 9pt;
+        }
+        th {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            text-align: left;
+            padding: 8px;
+            font-size: 8pt;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+        tr:nth-child(even) td { background-color: #f8fafc; }
+        .badge-danger { background-color: #fee2e2; color: #ef4444; padding: 2px 6px; font-size: 7pt; font-weight: bold; border-radius: 2px;}
+        .badge-warning { background-color: #fef3c7; color: #d97706; padding: 2px 6px; font-size: 7pt; font-weight: bold; border-radius: 2px;}
+
+        .summary-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 9pt;
+        }
+        .auto-analysis {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1 : EXECUTIVE SUMMARY & KPIS -->
+    <div class="report-header">
+        <div>
+            <div style="font-size: 20pt; font-weight: 900; color: #1e3a8a; letter-spacing: -1px;">HPS <span style="font-weight: 300;">| ASIMS</span></div>
+        </div>
+        <div class="header-meta">
+            <div class="header-title">Executive Report</div>
+            Type: <strong>{{ report_info.get_type_rapport_display|default:report_info.type_rapport }}</strong><br>
+            Période: <strong>{% if report_info.date_debut %}{{ report_info.date_debut }}{% if report_info.date_fin %} au {{ report_info.date_fin }}{% endif %}{% else %}{{ report_info.type_rapport }}{% endif %}</strong><br>
+            Généré le: <strong>{{ report_info.date_generation|date:"d/m/Y" }}</strong>
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <strong>Résumé Exécutif :</strong> {{ report_info.executive_summary|default:"" }}
+    </div>
+
+    <div class="section-title">Indicateurs de Performance (KPIs)</div>
+    <div class="grid-kpi">
+        <div class="kpi-box">
+            <div class="kpi-label">Total Parc GAB</div>
+            <div class="kpi-value">{{ kpis.total_gab|default:0 }}</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Opérationnels</div>
+            <div class="kpi-value success">{{ kpis.operational_gab|default:0 }}</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Hors Service</div>
+            <div class="kpi-value danger">{{ kpis.offline_gab|default:0 }}</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Incidents Ouverts</div>
+            <div class="kpi-value">{{ incidents.ouverts|default:0 }}</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Total Incidents</div>
+            <div class="kpi-value">{{ kpis.total_incidents|default:0 }}</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Disponibilité</div>
+            <div class="kpi-value success">{{ kpis.availability|default:0 }}%</div>
+        </div>
+    </div>
+
+    <div class="chart-row">
+        <div class="chart-container">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Évolution de la Disponibilité (%)</div>
+            {% if charts.availability_chart %}<img src="{{ charts.availability_chart }}">{% else %}<div class="chart-placeholder">[ Matplotlib : Line Chart Disponibilité ]</div>{% endif %}
+        </div>
+        <div class="chart-container">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Répartition des États</div>
+            {% if charts.state_distribution_chart %}<img src="{{ charts.state_distribution_chart }}">{% else %}<div class="chart-placeholder">[ Matplotlib : Donut Chart États ]</div>{% endif %}
+        </div>
+    </div>
+
+    <!-- PAGE 2 : ANALYSE DES INCIDENTS -->
+    <div class="page-break"></div>
+
+    <div class="report-header">
+        <div style="font-size: 14pt; font-weight: bold; color: #1e3a8a;">ASIMS</div>
+        <div class="header-meta">Détails des Incidents | <strong>{% if report_info.date_debut %}{{ report_info.date_debut }}{% if report_info.date_fin %} au {{ report_info.date_fin }}{% endif %}{% else %}{{ report_info.type_rapport }}{% endif %}</strong></div>
+    </div>
+
+    <div class="section-title">Analyse des Incidents & Interventions</div>
+
+    <div class="chart-row">
+        <div class="chart-container" style="flex: 2;">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Évolution des Incidents par Priorité</div>
+            {% if charts.priority_chart %}<img src="{{ charts.priority_chart }}">{% else %}<div class="chart-placeholder" style="height: 300px;">[ Matplotlib : Stacked Bar Chart Incidents ]</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="chart-row">
+        <div class="chart-container">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Répartition par Cause Racine</div>
+            {% if charts.root_cause_chart %}<img src="{{ charts.root_cause_chart }}">{% else %}<div class="chart-placeholder" style="height: 250px;">[ Matplotlib : Horizontal Bar Chart Causes ]</div>{% endif %}
+        </div>
+        <div class="chart-container">
+            <div class="kpi-label" style="text-align: left; margin-bottom: 10px;">Volume d'Interventions</div>
+            {% if charts.intervention_chart %}<img src="{{ charts.intervention_chart }}">{% else %}<div class="chart-placeholder" style="height: 250px;">[ Matplotlib : Area Chart Interventions ]</div>{% endif %}
+        </div>
+    </div>
+
+    <!-- PAGE 3 : DONNÉES DÉTAILLÉES -->
+    <div class="page-break"></div>
+
+    <div class="report-header">
+        <div style="font-size: 14pt; font-weight: bold; color: #1e3a8a;">ASIMS</div>
+        <div class="header-meta">Données Détaillées | <strong>{% if report_info.date_debut %}{{ report_info.date_debut }}{% if report_info.date_fin %} au {{ report_info.date_fin }}{% endif %}{% else %}{{ report_info.type_rapport }}{% endif %}</strong></div>
+    </div>
+
+    <div class="section-title">Top 10 GAB Critiques (Disponibilité &lt; 90%)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID Terminal</th>
+                <th>Agence / Localisation</th>
+                <th>Région</th>
+                <th>Total Incidents</th>
+                <th>Disponibilité</th>
+                <th>Statut Actuel</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in gab.gabs|slice:":10" %}
+            <tr>
+                <td><strong>{{ g.terminal }}</strong></td>
+                <td>{{ g.libelle_agence|default:g.nom_gab|default:"-" }}</td>
+                <td>{{ g.ville|default:"-" }}</td>
+                <td>{{ g.total_incidents|default:"-" }}</td>
+                <td><strong style="color: #ef4444;">{{ g.availability|default:"-" }}%</strong></td>
+                <td>
+                    {% if g.etat == "HORS_SERVICE" %}<span class="badge-danger">HORS SERVICE</span>
+                    {% elif g.etat == "CRITIQUE" %}<span class="badge-warning">CRITIQUE</span>
+                    {% else %}{{ g.etat|default:"-" }}{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align: center; color: #94a3b8;">Aucun GAB critique sur la période.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">Agences les plus impactées</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Agence</th>
+                <th>Nombre de GAB</th>
+                <th>Incidents Majeurs</th>
+                <th>MTTR Agence</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for agence in charts.rankings.agences|default:'' %}
+            <tr>
+                <td>{{ agence.nom|default:agence.libelle_agence|default:"-" }}</td>
+                <td>{{ agence.nb_gab|default:agence.total|default:"-" }}</td>
+                <td>{{ agence.incidents_majeurs|default:"-" }}</td>
+                <td>{{ agence.mttr|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="text-align: center; color: #94a3b8;">Aucune donnée disponible.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- PAGE 4 : CONCLUSION -->
+    <div class="page-break"></div>
+
+    <div class="report-header">
+        <div style="font-size: 14pt; font-weight: bold; color: #1e3a8a;">ASIMS</div>
+        <div class="header-meta">Analyses & Recommandations | <strong>{% if report_info.date_debut %}{{ report_info.date_debut }}{% if report_info.date_fin %} au {{ report_info.date_fin }}{% endif %}{% else %}{{ report_info.type_rapport }}{% endif %}</strong></div>
+    </div>
+
+    <div class="section-title">Analyse Automatique du Système</div>
+    <div class="auto-analysis">
+        <h4 style="margin-bottom: 10px;">Observations Générées :</h4>
+        <p style="margin-top: 0; font-size: 9pt;">{{ report_info.analysis|default:"" }}</p>
+    </div>
+
+    <div class="section-title">Conclusion & Recommandations Management</div>
+    <p style="font-size: 9.5pt; text-align: justify;">
+        {{ report_info.conclusion|default:"" }}
+    </p>
+
+    <div style="position: absolute; bottom: 2cm; left: 1.5cm; right: 1.5cm; border-top: 1px solid #cbd5e1; padding-top: 10px; font-size: 8pt; color: #94a3b8; text-align: center;">
+        Ce rapport a été généré automatiquement par la plateforme ASIMS (Automated Supervision & Incident Management System).<br>
+        Pour toute question, veuillez contacter le centre de supervision central. © 2026 HPS.
+    </div>
+
+</body>
+</html>
